@@ -1,8 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 
 export enum JumpTypeEnum {
-    modal = 'modal',
-    router = 'router',
+  modal = "modal",
+  router = "router",
 }
 
 interface ModalBlockContent {
@@ -22,5 +22,6 @@ interface HistoryBlockContent {
 export type BlockContent = ModalBlockContent | HistoryBlockContent;
 
 export interface FunctionBlockProps {
-    blockContent: BlockContent[];
+  blockContent: BlockContent[];
+  style?: React.CSSProperties;
 }

@@ -1,9 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'umi';
-import { Form, Input, Divider, Button, Toast } from 'antd-mobile';
+import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { StatusEnum, PhoneLogin, Registor, PwLogin } from './index.type';
+import LoginBg from './../../assets/images/welcome.jpg';
 import './index.less';
+import '@/pages/global.less';
 
 export default function Login() {
     const [currentStatus, setCurrentStatus] = useState(StatusEnum.phoneLogin);
@@ -26,7 +28,7 @@ export default function Login() {
     const navigate = useNavigate();
 
     const sendCode = () => {
-        
+
     }
 
     const handleGo = (key: number) => {
@@ -52,13 +54,13 @@ export default function Login() {
         if (currentStatus === StatusEnum.register) {
             return (
                 <div className='btn'>
-                    <Button onClick={handleLoginOrRegidter} style={{ padding: '5px 46px' }} color='primary'>注册</Button>
+                    <Button onClick={handleLoginOrRegidter} style={{ padding: '7px 85px' }} color='primary'>注册</Button>
                 </div>
             );
         }
         return (
             <div className='btn'>
-                <Button onClick={handleLoginOrRegidter} style={{ padding: '5px 46px' }} color='primary'>登录</Button>
+                <Button onClick={handleLoginOrRegidter} style={{ padding: '7px 85px' }} color='primary'>登录</Button>
             </div>
         );
     }, [currentStatus])
@@ -66,19 +68,14 @@ export default function Login() {
     return (
         <div className='login'>
             <div className="login-content">
+                <Image
+                    src={LoginBg}
+                    width={'100%'}
+                    height={'168px'}
+                    fit='cover'
+                />
                 <Form form={form} layout='horizontal'>
                     <Form.Item label='手机号' name='phone'>
-                        <Input placeholder='请输入' clearable />
-                    </Form.Item>
-                    <Form.Item
-                        label='图形验证码'
-                        name='picCode'
-                        extra={
-                            <div className='extraPart'>
-                                <a>ABCD</a>
-                            </div>
-                        }
-                    >
                         <Input placeholder='请输入' clearable />
                     </Form.Item>
                     {
@@ -119,7 +116,7 @@ export default function Login() {
                     }
                 </Form>
             </div>
-           { currentBtn }
+            {currentBtn}
             <div className='login-bottom-ways'>
                 {
                     statusText.current.map(item => {

@@ -1,3 +1,28 @@
 .uploadvideo {
+    position: relative;
     height: 200px;
+    background: #CCCC;
+    border: 1px solid;
+}
+.uploadvideo::before,
+.uploadvideo::after {
+    content: '';
+    position: absolute;
+    background-color: white;
+}
+
+.uploadvideo::before {
+    top: 50%;
+    left: 50%;
+    width: 31%;
+    height: 14px;
+    transform: translate(-49%);
+}
+
+.uploadvideo::after {
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 57%;
+    transform: translate(-50%, -42%);
 }

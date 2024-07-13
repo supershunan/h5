@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavBar, Form, Button, TextArea, Input, Stepper, Dialog, Image } from 'antd-mobile';
 import styles from './index.less';
+import feedBackBg from '@/assets/images/feedback.jpg';
 
 export default function FeedBack() {
     const back = () => {
@@ -12,15 +13,16 @@ export default function FeedBack() {
     }
     return (
         <div className={styles.feedbackContainer}>
-            <NavBar back='意见反馈' onBack={back}></NavBar>
+            <NavBar back='返回' onBack={back}>
+                意见反馈
+            </NavBar>
             <div className={styles.feedbackbg}>
             </div>
             <Image
-                src='/src/assets/images/loginbg.jpg'
-                width={64}
-                height={64}
+                src={feedBackBg}
+                width={'100%'}
+                height={'100%'}
                 fit='cover'
-                style={{ borderRadius: 4 }}
             />
             <div>
                 <Form

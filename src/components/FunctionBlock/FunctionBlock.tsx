@@ -6,7 +6,7 @@ import styles from './index.less';
 import { FunctionBlockProps, JumpTypeEnum, BlockContent } from './type';
 
 export default function FunctionBlock(props: FunctionBlockProps) {
-    const { blockContent } = props;
+    const { blockContent, style } = props;
     const handleClick = (type: string, content: string) => {
         if (type === JumpTypeEnum['router']) {
             history.push(content)
@@ -21,7 +21,7 @@ export default function FunctionBlock(props: FunctionBlockProps) {
     }
 
     return (
-        <div>
+        <div style={{...style}}>
             <Card>
                 <div className={styles.functionalModules}>
                     {
