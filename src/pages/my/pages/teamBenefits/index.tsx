@@ -1,10 +1,59 @@
+import React, { useState } from 'react'
+import { Avatar, Card, List } from 'antd-mobile'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
-import React from 'react'
 
 export default function TeamBenefits() {
-  return (
-    <div>
-      <NavBarBack content={'团队收益'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-    </div>
-  )
+    const [data, setData] = useState([
+        {
+            id: 1,
+            name: 'test1',
+            statu: 1,
+            money: '100',
+        },
+        {
+            id: 2,
+            name: 'test1',
+            statu: 1,
+            money: '100',
+        },
+        {
+            id: 3,
+            name: 'test1',
+            statu: 0,
+            money: '100',
+        }
+    ])
+    const demoAvatarImages = [
+        'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ',
+    ]
+    return (
+        <div style={{ padding: '46px 0' }}>
+            <NavBarBack content={'团队收益'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <div style={{ padding: '6px' }}>
+                <List style={{ '--border-top': '0' }}>
+                    {data.map((item, index) => (
+                        <List.Item key={index}>
+                            <Card>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e1d7d7', marginBottom: '5px' }}>
+                                    <span>订单号：{item.id}</span>
+                                    <span style={{ color: 'red' }}>{item.statu ? '已完成' : '未完成'}</span>
+                                </div>
+                                <div className="orderItem" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <Avatar src={demoAvatarImages[0]} />
+                                        <span style={{ marginLeft: '5px'}}>{item.name}</span>
+                                    </div>
+                                    <span>
+                                        已得分成：
+                                        <span style={{ color: 'red', fontWeight: '700'}}>{item.money} </span>
+                                        元
+                                    </span>
+                                </div>
+                            </Card>
+                        </List.Item>
+                    ))}
+                </List>
+            </div>
+        </div>
+    )
 }
