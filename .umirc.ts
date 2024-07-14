@@ -61,6 +61,34 @@ export default defineConfig({
       path: '/my',
       component: '@/pages/my/index',
     },
+    {
+      path: '/historyIncome',
+      component: '@/pages/my/pages/historyIncome/index.tsx',
+    },
+    {
+      path: '/toolbox',
+      component: '@/pages/my/pages/toolbox/index.tsx',
+    },
+    {
+      path: '/cooperation',
+      component: '@/pages/my/pages/cooperation/index.tsx',
+    },
+    {
+      path: '/userAgreement',
+      component: '@/pages/my/pages/userAgreement/index.tsx',
+    },
+    {
+      path: '/setting',
+      component: '@/pages/my/pages/setting/index.tsx',
+    },
+    {
+      path: '/withdrawal',
+      component: '@/pages/my/pages/withdrawal/index.tsx',
+    },
+    {
+      path: '/teamBenefits',
+      component: '@/pages/my/pages/teamBenefits/index.tsx',
+    },
     { path: '/*', component: '@/pages/404', layout: false },
   ],
   npmClient: 'pnpm',
