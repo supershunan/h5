@@ -5,5 +5,7 @@ export interface TopSwiperProps {
 
 interface SwipPictures {
     id: number;
-    picture: string;
+    /** 轮播图 */
+    val: string;
+    name: string;
 }

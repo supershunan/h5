@@ -1,8 +1,13 @@
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
-import { List } from 'antd-mobile'
-import React, { useState } from 'react'
+import { List, InfiniteScroll } from 'antd-mobile'
+import React, { useEffect, useState } from 'react'
+import request from '@/utils/request/request';
+import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function HistoryIncome() {
+    const [historyItems, setHistoryItems] = useState<{ id: number, title: string, content: string }[]>([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [params, setParmas] = useState<{ page: number, rows: number }>({ page: 1, rows: 5 });
     const [data, setData] = useState([
         {
             id: 1,
@@ -17,6 +22,27 @@ export default function HistoryIncome() {
             advertMoney: '100',
         }
     ])
+
+    const loadHistoryItems = async () => {
+        const res = await request('/newApi/moneyLog/pageMy', {
+            method: 'POST',
+            body: JSON.stringify(params),
+        });
+        const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
+
+        if (status) {
+            setHistoryItems([
+                ...historyItems,
+                ...res.rows
+            ]);
+            setParmas({
+                page: params.page + 1,
+                rows: params.rows
+            })
+        }
+        setHasMore(status)
+    }
+
     return (
         <div style={{ padding: '46px 0' }}>
             <NavBarBack content={'历史收益'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
@@ -37,6 +63,7 @@ export default function HistoryIncome() {
                         </List.Item>
                     ))}
                 </List>
+                <InfiniteScroll loadMore={loadHistoryItems} hasMore={hasMore} />
             </div>
         </div>
     )

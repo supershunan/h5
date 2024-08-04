@@ -11,7 +11,8 @@
   "dependencies": {
     "antd-mobile": "^5.37.1",
     "antd-mobile-icons": "^0.3.0",
-    "umi": "^4.3.1"
+    "umi": "^4.3.1",
+    "umi-request": "^1.4.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.33",

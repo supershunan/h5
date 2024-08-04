@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Avatar, Button, Card, Divider, Image, Space } from 'antd-mobile'
 import BgImg from '@/assets/images/welcome.jpg'
 import FunctionBlock from '@/components/FunctionBlock/FunctionBlock';
@@ -6,8 +6,11 @@ import { JumpTypeEnum } from '@/components/FunctionBlock/type';
 import { AppstoreOutline, GlobalOutline, SetOutline, PayCircleOutline, LinkOutline, ReceiptOutline } from 'antd-mobile-icons';
 import './index.less'
 import { history } from 'umi';
+import request from '@/utils/request/request';
+import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function Me() {
+    const [userInfo, setUserInfo] = useState();
     const demoAvatarImages = [
         'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ',
     ]
@@ -51,6 +54,10 @@ export default function Me() {
             icon: <ReceiptOutline style={{ fontSize: '31px' }} />
         },
     ]
+
+    useEffect(() => {
+        getUserInfo();
+    }, []);
     const functionBlock = useMemo(() => {
         return <FunctionBlock blockContent={BLOCK_CONTENT} style={{ padding: '0 6px' }} />
     }, [BLOCK_CONTENT]);
@@ -67,6 +74,14 @@ export default function Me() {
         history.push('/withdrawal')
     }
 
+    const getUserInfo = async () => {
+        const res = await request('/newApi/user/myInfo', { method: 'GET'});
+
+        if (res.code === RequstStatusEnum.success) {
+            setUserInfo(res.data)
+        }
+    }
+
     return (
         <div>
             <div className="bg">
@@ -77,9 +92,9 @@ export default function Me() {
                     <div className="userInfo">
                         <Avatar src={demoAvatarImages[0]} style={{ '--size': '64px', borderRadius: '50px' }} />
                         <div className="info">
-                            <div className='nick'>舒楠</div>
-                            <div>账号：12346789</div>
-                            <div>舒楠</div>
+                            <div className='nick'>{ userInfo?.nickname ?? '默认昵称' }</div>
+                            <div>账号：{ userInfo?.account }</div>
+                            <div>{ userInfo?.nickname ?? '默认昵称' }</div>
                         </div>
                     </div>
                 </Card>
@@ -97,7 +112,7 @@ export default function Me() {
                             </div>
                         </div>
                         <div className="withdrawal">
-                            <span>可提现 <span className='useableMoney'>￥10000</span> 元</span>
+                            <span>可提现 <span className='useableMoney'>￥{ userInfo?.canWithdrawalBalance ?? 0 }</span> 元</span>
                             <Button onClick={goWithdrawal} style={{ width: '100px', background: '#FF8047', color: '#fff' }}>提现</Button>
                         </div>
                     </div>

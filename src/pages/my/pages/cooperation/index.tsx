@@ -46,7 +46,7 @@ export default function Cooperation() {
                     </Form.Item>
                     <Form.Item name='address' label='商务合作'>
                         <TextArea
-                            placeholder='请输入地址'
+                            placeholder='请输入'
                             maxLength={100}
                             rows={2}
                             showCount

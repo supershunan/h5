@@ -1,21 +1,40 @@
-import React from 'react';
-import { NavBar, Form, Button, TextArea, Input, Stepper, Dialog, Image } from 'antd-mobile';
+import React, { useRef, useState } from 'react';
+import { Form, Button, TextArea, Input, Toast, Image } from 'antd-mobile';
 import styles from './index.less';
 import feedBackBg from '@/assets/images/feedback.jpg';
+import NavBarBack from '@/components/NavBarBack/NavBarBack'
+import request from '@/utils/request/request';
+import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function FeedBack() {
-    const back = () => {
-        history.back();
+    const [form] = Form.useForm();
+
+    const onFinish = async (values: any) => {
+        const data = JSON.stringify(values);
+        const res = await request('/newApi/feedback/add', {
+            method: 'POST',
+            body: data
+        })
+        if (res.code === RequstStatusEnum.success) {
+            Toast.show({
+                icon: 'success',
+                content: `反馈成功`,
+                afterClose: () => {
+                    history.back();
+                }
+            });
+            form.resetFields();
+        } else {
+            Toast.show({
+                icon: 'fail',
+                content: `反馈失败，请重试`,
+            });
+        }
     }
 
-    const onFinish = (values: any) => {
-        console.log(values)
-    }
     return (
         <div className={styles.feedbackContainer}>
-            <NavBar back='返回' onBack={back}>
-                意见反馈
-            </NavBar>
+            <NavBarBack content={'意见反馈'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div className={styles.feedbackbg}>
             </div>
             <Image
@@ -27,6 +46,7 @@ export default function FeedBack() {
             <div>
                 <Form
                     name='form'
+                    form={form}
                     onFinish={onFinish}
                     layout='horizontal'
                     footer={
@@ -41,10 +61,10 @@ export default function FeedBack() {
                     >
                         <Input onChange={console.log} placeholder='请输入' />
                     </Form.Item>
-                    <Form.Item name='amount' label='手机号/微信号'>
+                    <Form.Item name='phone' label='手机号/微信号'>
                         <Input onChange={console.log} placeholder='请输入' />
                     </Form.Item>
-                    <Form.Item name='address' label='反馈信息'>
+                    <Form.Item name='info' label='反馈信息'>
                         <TextArea
                             placeholder='请输入地址'
                             maxLength={100}

@@ -1,30 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Card } from 'antd-mobile';
 import { BankcardOutline, UserSetOutline, DownlandOutline, FileOutline } from 'antd-mobile-icons'
 import styles from './index.less';
 import { TopSwiper } from '@/components/TopSwiper/TopSwiper';
 import FunctionBlock from '@/components/FunctionBlock/FunctionBlock';
 import { JumpTypeEnum } from '@/components/FunctionBlock/type';
+import request from '@/utils/request/request';
+import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function Home() {
-	const [swipPictures, setSwipPictures] = useState([
-		{
-			id: 0,
-			picture: '#ace0ff',
-		},
-		{
-			id: 1,
-			picture: '#bcffbd',
-		},
-		{
-			id: 3,
-			picture: '#e4fabd',
-		},
-		{
-			id: 4,
-			picture: '#ffcfac',
-		},
-	]);
+	const [swipPictures, setSwipPictures] = useState([]);
 	const [advertisementTextlls, setAdvertisementTextlls] = useState('广告栏内容');
 	const [videoSources, setVideoSources] = useState([
 		'video1.mp4',
@@ -57,6 +42,17 @@ export default function Home() {
 			icon: <DownlandOutline style={{ fontSize: '31px' }} />
 		}
 	]
+
+	useEffect(() => {
+		getBanner();
+	}, []);
+
+	const getBanner = async () => {
+		const res = await request('/newApi/gconfig/getBanners', {
+            method: 'GET',
+        });
+		res.code === RequstStatusEnum.success && setSwipPictures(res.data);
+	}
 
 	/** 顶部轮播图和广告栏 */
 	const TopContent = useMemo(() => {
