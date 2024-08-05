@@ -28,10 +28,10 @@ export default function ContentList(props: ContentListProps) {
                             <Grid.Item key={index}>
                                 <div className='contentItem' style={{ padding: '2px', background: '#f8f8fb' }}>
                                     <div onClick={() => handleItem && handleItem(item)}>
-                                        <Image src={'https://images.unsplash.com/photo-1567945716310-4745a6b7844b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=60'} width={'100%'} height={100} fit='fill' />
+                                        <Image src={item.coverImg} width={'100%'} height={100} fit='fill' />
                                     </div>
                                     <div className='itemTitle' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span>{item.name}</span>
+                                        <span>{item.title}</span>
                                         {
                                             actions && <Popover.Menu
                                                 actions={actions}

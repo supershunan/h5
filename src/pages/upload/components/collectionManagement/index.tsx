@@ -1,200 +1,276 @@
-import React, { useState } from 'react'
-import { Toast, Dialog, Button, Popup, Form, Input, ImageUploader, ImageUploadItem, Checkbox } from 'antd-mobile'
-import { history } from 'umi';
-import { Action } from 'antd-mobile/es/components/popover'
-import NavBarBack from '@/components/NavBarBack/NavBarBack'
-import { ItemOperateEnum } from './type';
-import './index.less';
-import ContentList from '@/components/ContentList/ContentList';
+import React, { useEffect, useState } from "react";
+import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space } from "antd-mobile";
+import { history } from "umi";
+import { Action } from "antd-mobile/es/components/popover";
+import NavBarBack from "@/components/NavBarBack/NavBarBack";
+import ContentList from "@/components/ContentList/ContentList";
+import request from "@/utils/request/request";
+import { RequstStatusEnum } from "@/utils/request/request.type";
+import {
+    ItemOperateEnum,
+    AddFolderParams,
+    CollectionItem,
+    PromotionEnum,
+} from "./type";
+import "./index.less";
 
-function getNextData() {
-    const ret: string[] = []
-    for (let i = 0; i < 18; i++) {
-        //   ret.unshift(lorem.generateWords(1))
-    }
-    return ret
-}
 export default function CollectionManagement() {
-    const [data, setData] = useState([
-        {
-            id: 0,
-            name: '合集名0',
-        },
-        {
-            id: 1,
-            name: '合集名1',
-        },
-        {
-            id: 1,
-            name: '合集名1',
-        },
-        {
-            id: 1,
-            name: '合集名1',
-        },
-        {
-            id: 1,
-            name: '合集名1',
-        },
-        {
-            id: 1,
-            name: '合集名1',
-        },
-        {
-            id: 1,
-            name: '合集名1',
-        }
-    ])
+    const [data, setData] = useState([]);
+    const [itemData, setItemData] = useState<CollectionItem | undefined>();
     const actions: Action[] = [
-        { key: ItemOperateEnum.setting, text: '设置' },
-        { key: ItemOperateEnum.startPromotion, text: '开始推广' },
-        { key: ItemOperateEnum.overPromotion, text: '关闭推广' },
-        { key: ItemOperateEnum.delete, text: '删除' },
-    ]
-    const [visible1, setVisible1] = useState(false)
-    const [fileList, setFileList] = useState<ImageUploadItem[]>()
+        { key: ItemOperateEnum.setting, text: "设置" },
+        { key: ItemOperateEnum.startPromotion, text: "开始推广" },
+        { key: ItemOperateEnum.overPromotion, text: "关闭推广" },
+        { key: ItemOperateEnum.delete, text: "删除" },
+    ];
+    const [visible, setVisible] = useState(false);
     const [form] = Form.useForm();
 
-    const handlePop = (node: Action, item) => {
+    useEffect(() => {
+        getCollectionList();
+    }, []);
+
+    const getCollectionList = async () => {
+        const res = await request("/newApi/works/listFolder", { method: "GET" });
+        if (res.code === RequstStatusEnum.success) setData(res.data);
+    };
+
+    const getCollectionItem = async (id: number) => {
+        const res = await request(`/newApi/works/getById/${id}`, { method: "GET" });
+        if (res.code === RequstStatusEnum.success) {
+            setItemData(res.data);
+            form.setFieldsValue(res.data); // 更新表单字段的值
+        }
+    };
+
+    const updateList = async () => {
+        await getCollectionList();
+    };
+
+    const addCollection = async (params: AddFolderParams): Promise<boolean> => {
+        const data = JSON.stringify({
+            title: params.title,
+            coverImg:
+                "https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641",
+            promotionUrl: params.promotionUrl,
+            enablePromotion: params.enablePromotion
+                ? PromotionEnum.start
+                : PromotionEnum.end,
+        });
+        const res = await request("/newApi/works/addFolder", {
+            method: "POST",
+            body: data,
+        });
+        return res.code === RequstStatusEnum.success;
+    };
+
+    const deleteCollection = async (ids: number) => {
+        const data = JSON.stringify({ ids });
+        const res = await request("/newApi/works/del", {
+            method: "POST",
+            body: data,
+        });
+        Toast.show({
+            content: res.code === RequstStatusEnum.success ? "删除成功" : "删除失败",
+        });
+    };
+
+    const updateCollection = async (item: CollectionItem) => {
+        const data = JSON.stringify({
+            id: item.id,
+            title: item.title,
+            coverImg:
+                "https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641",
+            promotionUrl: item.promotionUrl,
+            enablePromotion: item.enablePromotion
+                ? PromotionEnum.start
+                : PromotionEnum.end,
+        });
+        const res = await request("/newApi/works/update", {
+            method: "POST",
+            body: data,
+        });
+    };
+
+    const isPromotion = async (id: number, enablePromotion: number) => {
+        const res = await request(
+            `/newApi/works/enablePromotion/${id}/${enablePromotion}`,
+            { method: "POST" }
+        );
+        Toast.show({
+            content: res.code === RequstStatusEnum.success ? "推广成功" : "推广失败",
+        });
+    };
+
+    const handlePop = async (node: Action, item: CollectionItem) => {
         switch (node.key) {
             case ItemOperateEnum.setting:
-                setVisible1(true)
+                await getCollectionItem(item.id);
+                setVisible(true);
                 break;
             case ItemOperateEnum.startPromotion:
                 Dialog.show({
-                    content: '开启推广?',
+                    content: "开启推广?",
                     closeOnAction: true,
                     actions: [
                         [
                             {
-                                key: 'cancel',
-                                text: '取消',
+                                key: "cancel",
+                                text: "取消",
                             },
                             {
-                                key: 'ok',
-                                text: '确认',
+                                key: "ok",
+                                text: "确认",
                                 bold: true,
                                 danger: true,
-                                onClick: () => { console.log(item.id, 'ok') }
+                                onClick: async () => {
+                                    await isPromotion(item.id, PromotionEnum.start);
+                                    await updateList();
+                                },
                             },
                         ],
                     ],
-                })
+                });
                 break;
             case ItemOperateEnum.overPromotion:
                 Dialog.show({
-                    content: '关闭推广?',
+                    content: "关闭推广?",
                     closeOnAction: true,
                     actions: [
                         [
                             {
-                                key: 'cancel',
-                                text: '取消',
+                                key: "cancel",
+                                text: "取消",
                             },
                             {
-                                key: 'ok',
-                                text: '确认',
+                                key: "ok",
+                                text: "确认",
                                 bold: true,
                                 danger: true,
-                                onClick: () => { console.log(item.id, 'ok') }
+                                onClick: async () => {
+                                    await isPromotion(item.id, PromotionEnum.end);
+                                    await updateList();
+                                },
                             },
                         ],
                     ],
-                })
+                });
                 break;
             case ItemOperateEnum.delete:
                 Dialog.show({
-                    content: '确认删除吗?',
+                    content: "确认删除吗?",
                     closeOnAction: true,
                     actions: [
                         [
                             {
-                                key: 'cancel',
-                                text: '取消',
+                                key: "cancel",
+                                text: "取消",
                             },
                             {
-                                key: 'delete',
-                                text: '删除',
+                                key: "delete",
+                                text: "删除",
                                 bold: true,
                                 danger: true,
-                                onClick: () => { console.log(item.id, 'delete') }
+                                onClick: async () => {
+                                    await deleteCollection(item.id);
+                                    await updateList();
+                                },
                             },
                         ],
                     ],
-                })
+                });
                 break;
-
             default:
                 break;
         }
-        console.log(node, item)
-    }
-    const goDetail = (item) => {
-        history.push(`/collectionManagement/${item.id}?name=${item.name}`);
-    }
+    };
 
-    function beforeUpload(file: File) {
-        if (file.size > 1024 * 1024) {
-            Toast.show('请选择小于 1M 的图片')
-            return null
-        }
-        return file
-    }
-    
-    const handleAdd = () => {
-        setVisible1(false)
+    const goDetail = (item: CollectionItem) => {
+        getCollectionItem(item.id); // 获取数据时更新表单
+        history.push(`/collectionManagement/${item.id}?name=${item.name}`);
+    };
+
+    const handleAdd = async () => {
+        const formValue = form.getFieldsValue();
+        const addStatus = await addCollection(formValue);
+        setVisible(!addStatus);
         Toast.show({
-            content: '创建成功'
-        })
-        form.resetFields();
-    }
+            content: addStatus ? "创建成功" : "创建失败",
+        });
+        if (addStatus) {
+            form.resetFields();
+            setItemData(undefined); // 成功创建后重置 itemData
+        }
+        updateList();
+    };
 
     return (
-        <div className='collectionContainer' style={{ padding: '46px 0' }}>
-            <NavBarBack content={'合集管理'} style={{ background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-            <div className='collectContent'>
-                <ContentList contentList={data} actions={actions} handlePop={handlePop} handleItem={goDetail} />
+        <div className="collectionContainer" style={{ padding: "46px 0" }}>
+            <NavBarBack
+                content={"合集管理"}
+                style={{
+                    background: "#f8f8fb",
+                    position: "fixed",
+                    top: "0",
+                    width: "100%",
+                    zIndex: "99",
+                }}
+            />
+            <div className="collectContent">
+                <ContentList
+                    contentList={data}
+                    actions={actions}
+                    handlePop={handlePop}
+                    handleItem={goDetail}
+                />
                 <div className="floatBtn">
-                    <Button onClick={() => { setVisible1(true) }} block color='primary' size='large'>
+                    <Button
+                        onClick={() => {
+                            setItemData(undefined);
+                            form.resetFields();
+                            setVisible(true);
+                        }}
+                        block
+                        color="primary"
+                        size="large"
+                    >
                         创建合辑
                     </Button>
                 </div>
                 <Popup
-                    visible={visible1}
+                    visible={visible}
                     onMaskClick={() => {
-                        setVisible1(false)
+                        setVisible(false);
                     }}
                     onClose={() => {
-                        setVisible1(false)
+                        setVisible(false);
                     }}
                     showCloseButton
                     bodyStyle={{
-                        borderTopLeftRadius: '8px',
-                        borderTopRightRadius: '8px',
-                        minHeight: '40vh',
+                        borderTopLeftRadius: "8px",
+                        borderTopRightRadius: "8px",
+                        minHeight: "40vh",
                     }}
                 >
                     <div className="createcollection">
                         <Form
                             form={form}
                             onFinish={handleAdd}
+                            initialValues={itemData}
                             footer={
-                                <Button block type='submit' color='primary' size='large'>
+                                <Button block type="submit" color="primary" size="large">
                                     提交
                                 </Button>
                             }
                         >
                             <Form.Header>
-                                <div style={{ textAlign: 'center' }}>创建合集</div>
+                                <div style={{ textAlign: "center" }}>创建合集</div>
                             </Form.Header>
-                            <Form.Item
-                                name='name'
-                                label='合集名'
-                            >
-                                <Input onChange={console.log} placeholder='请输入' />
+                            <Form.Item name="title" label="合集名">
+                                <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item
-                                name='pic'
+                            {/* <Form.Item
+                                name='coverImg'
                                 label='合集封面'
                             >
                                 <ImageUploader
@@ -204,23 +280,22 @@ export default function CollectionManagement() {
                                     beforeUpload={beforeUpload}
                                     maxCount={1}
                                 />
+                            </Form.Item> */}
+                            <Form.Item name="promotionUrl" label="推广">
+                                <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item
-                                name='spread'
-                                label='推广'
-                            >
-                                <Input onChange={console.log} placeholder='请输入' />
-                            </Form.Item>
-                            <Form.Item
-                                name='spreadStatu'
-                                label='是否推广'
-                            >
-                                <Checkbox>是</Checkbox>
+                            <Form.Item name="enablePromotion" label="是否推广">
+                                <Radio.Group>
+                                    <Space>
+                                        <Radio value={1}>是</Radio>
+                                        <Radio value={0}>否</Radio>
+                                    </Space>
+                                </Radio.Group>
                             </Form.Item>
                         </Form>
                     </div>
                 </Popup>
             </div>
         </div>
-    )
+    );
 }

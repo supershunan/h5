@@ -31,7 +31,6 @@ export default function Setting() {
             Toast.show('请选择小于 1M 的图片')
             return null
         }
-        console.log('wkk', file)
         return file
     }
     const resetUserInfo = async () => {
