@@ -5,7 +5,7 @@ export default function Toolbox() {
   return (
     <div>
         <NavBarBack content={'工具箱'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-      markdown
+        markdown
     </div>
   )
 }

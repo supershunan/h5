@@ -7,13 +7,18 @@ export enum StatusEnum {
     pwLogin,
 }
 
+export enum LoginTypeEnum {
+    /** 密码登录 */
+    pwLogin,
+    /** 手机号登录 */
+    phoneLogin
+}
+
 export interface PhoneLogin {
     /** 手机号 */
-    phone?: number;
-    /** 图形验证码 */
-    picCode?: string;
+    account?: number;
     /** 验证码 */
-    code?: number;
+    smsCode?: number;
 }
 
 export interface Registor extends PhoneLogin {
@@ -21,4 +26,4 @@ export interface Registor extends PhoneLogin {
     password?: string;
 }
 
-export type PwLogin = Omit<PhoneLogin, 'code'> & { password: string };
+export type PwLogin = Omit<PhoneLogin, 'smsCode'> & { password: string };

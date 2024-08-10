@@ -71,7 +71,7 @@ export default function Me() {
     }
 
     const goWithdrawal = () => {
-        history.push('/withdrawal')
+        history.push(`/withdrawal?totalIncome=${userInfo?.totalIncome}`)
     }
 
     const getUserInfo = async () => {

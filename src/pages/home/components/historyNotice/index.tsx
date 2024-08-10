@@ -17,7 +17,7 @@ export default function HistoryNotice() {
     const loadHistoryItems = async () => {
         const res = await request('/newApi/noticeList/page', {
             method: 'POST',
-            body: JSON.stringify(params),
+            body: params,
         });
         const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
 

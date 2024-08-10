@@ -10,7 +10,7 @@ export default function FeedBack() {
     const [form] = Form.useForm();
 
     const onFinish = async (values: any) => {
-        const data = JSON.stringify(values);
+        const data = values;
         const res = await request('/newApi/feedback/add', {
             method: 'POST',
             body: data
@@ -66,7 +66,7 @@ export default function FeedBack() {
                     </Form.Item>
                     <Form.Item name='info' label='反馈信息'>
                         <TextArea
-                            placeholder='请输入地址'
+                            placeholder='请输入'
                             maxLength={100}
                             rows={2}
                             showCount

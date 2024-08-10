@@ -12,6 +12,7 @@ import { RequstStatusEnum } from '@/utils/request/request.type';
 export default function Upload() {
     const [swipPictures, setSwipPictures] = useState([]);
     const [advertisementTextlls, setAdvertisementTextlls] = useState('广告栏内容');
+    const [platformCustomer, setPlatformCustomer] = useState({ val: 'res'});
     const BLOCK_CONTENT = [
         {
             name: '合集管理',
@@ -28,7 +29,7 @@ export default function Upload() {
         {
             name: '平台客服',
             jumpType: JumpTypeEnum.modal,
-            modalContent: 'https://gw.alipayobjects.com/mdn/rms_efa86a/afts/img/A*SE7kRojatZ0AAAAAAAAAAAAAARQnAQ',
+            modalContent: platformCustomer?.val,
             icon: <UserSetOutline style={{ fontSize: '31px' }} />
         },
         {
@@ -41,6 +42,7 @@ export default function Upload() {
 
     useEffect(() => {
 		getBanner();
+        getPlatformCustomer();
 	}, []);
 
     const getBanner = async () => {
@@ -48,6 +50,19 @@ export default function Upload() {
             method: 'GET',
         });
 		res.code === RequstStatusEnum.success && setSwipPictures(res.data);
+	}
+
+    const getAdvertisment = async () => {
+		// const type = 'privacy_policy';
+		// const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
+		// res.code === RequstStatusEnum.success && setAdvertisementTextlls()
+	}
+
+    const getPlatformCustomer = async () => {
+		const type = 'customer_service';
+		const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
+		console.log(res)
+		res.code === RequstStatusEnum.success && setPlatformCustomer(res.data[0])
 	}
 
     /** 顶部轮播图和广告栏 */
@@ -61,7 +76,7 @@ export default function Upload() {
     }, [BLOCK_CONTENT]);
 
     return (
-        <div>
+        <div style={{ paddingBottom: '60px' }}>
             {TopContent}
             {functionBlock}
             <div style={{ padding: '0 6px' }}>

@@ -2,10 +2,12 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'umi';
 import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
-import { StatusEnum, PhoneLogin, Registor, PwLogin } from './index.type';
+import { StatusEnum, PhoneLogin, Registor, PwLogin, LoginTypeEnum } from './index.type';
 import LoginBg from './../../assets/images/welcome.jpg';
 import './index.less';
 import '@/pages/global.less';
+import request from '@/utils/request/request';
+import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function Login() {
     const [currentStatus, setCurrentStatus] = useState(StatusEnum.phoneLogin);
@@ -27,26 +29,119 @@ export default function Login() {
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
-    const sendCode = () => {
 
+    const register = async (values: any): Promise<boolean> => {
+        const data = {
+            account: values.account,
+            password: values.password, //密码md5加密
+            smsCode: values.smsCode,//短信验证码
+            // pid: null //推荐人id，如果推荐人不为空，则要传到后台，如果推荐人不是团长会返回请求非法
+        };
+        const res = await request('/newApi/auth/regForH5', {
+            method: 'POST',
+            body: data
+        });
+        return res.code === RequstStatusEnum.success;
+    }
+
+    const sendSms = async (mobile: number) => {
+        const data = {
+            mobile
+        }
+        const res = await request('/newApi/auth/sendSms', {
+            method: 'POST',
+            body: data
+        })
+        Toast.show(res.msg)
+    }
+
+    const pwLogin = async (values: any): Promise<boolean> => {
+        const data = {
+            account: values.account,
+            password: values.password
+        }
+        const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
+            method: 'POST',
+            body: data
+        })
+        if (res.code === RequstStatusEnum.success) {
+            localStorage.setItem('Token', res.data.token);
+        }
+        return res.code === RequstStatusEnum.success;
+    }
+
+    const phoneLogin = async (values: any): Promise<boolean> => {
+        const data = {
+            account: values.account,
+            code: values.smsCode
+        }
+        const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.phoneLogin}`, {
+            method: 'POST',
+            body: data
+        })
+        if (res.code === RequstStatusEnum.success) {
+            localStorage.setItem('Token', res.data.token);
+        }
+        return res.code === RequstStatusEnum.success;
+    }
+
+    const sendCode = async () => {
+        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();
+        await sendSms(values?.account as number);
     }
 
     const handleGo = (key: number) => {
         setCurrentStatus(key);
     }
 
-    const handleLoginOrRegidter = () => {
+    const handleLoginOrRegidter = async () => {
+        let status;
         const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();
         console.log(values);
         if (currentStatus === StatusEnum.register) {
-            Toast.show({
-                icon: 'success',
-                content: '注册成功',
-            });
+            status = await register(values);
+            if (status) {
+                Toast.show({
+                    icon: 'success',
+                    content: '注册成功',
+                });
+                form.resetFields();
+            } else {
+                Toast.show({
+                    icon: 'fail',
+                    content: '注册失败',
+                });
+            }
             setCurrentStatus(StatusEnum.phoneLogin);
+        } else if (currentStatus === StatusEnum.pwLogin) {
+            status = await pwLogin(values);
+            if (status) {
+                Toast.show({
+                    icon: 'success',
+                    content: '登录成功',
+                });
+                form.resetFields();
+            } else {
+                Toast.show({
+                    icon: 'fail',
+                    content: '登录失败',
+                });
+            }
+        } else if (currentStatus === StatusEnum.phoneLogin) {
+            status = await phoneLogin(values);
+            if (status) {
+                Toast.show({
+                    icon: 'success',
+                    content: '登录成功',
+                });
+                form.resetFields();
+            } else {
+                Toast.show({
+                    icon: 'fail',
+                    content: '登录失败',
+                });
+            }
         }
-        form.resetFields();
-        window.localStorage.setItem('isLogin', true);
         navigate('/');
     }
 
@@ -75,14 +170,14 @@ export default function Login() {
                     fit='cover'
                 />
                 <Form form={form} layout='horizontal'>
-                    <Form.Item label='手机号' name='phone'>
+                    <Form.Item label='手机号' name='account'>
                         <Input placeholder='请输入' clearable />
                     </Form.Item>
                     {
                         currentStatus !== StatusEnum.pwLogin &&
                         <Form.Item
                             label='验证码'
-                            name='code'
+                            name='smsCode'
                             extra={
                                 <div className='extraPart' onClick={sendCode}>
                                     <a>发送验证码</a>

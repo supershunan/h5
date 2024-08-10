@@ -1,15 +1,62 @@
-export default async function require(path: string, options?: RequestInit) {
+import { history } from 'umi'
+import { CustomRequestInit } from './request.type';
+import { Toast } from 'antd-mobile';
+
+const BASE_URL = 'https://ksys.qfyingshi.cn';
+const Token = localStorage.getItem('Token') || '';
+
+export default async function request(path: string, options?: CustomRequestInit): Promise<T> {
+    // 请求拦截
+    if (!Token) {
+        history.push('/login');
+        return Promise.reject(new Error('No token found, redirecting to login.'));
+    }
+
+    // 重置 headers
+    const headers: HeadersInit = {
+        ...options?.headers,
+        "Content-Type": 'application/json',
+        "Authorization": Token,
+    }
+
+    const updateOptions: RequestInit = {
+        ...options,
+        headers,
+        body: options?.body ? JSON.stringify(options.body) : undefined,
+    }
+
+    const fetchPromise = await fetch(BASE_URL + path, updateOptions);
+
+    // 超时时间
+    const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out')), options?.timeout || 5000)
+    );
+
     try {
-        const response = await fetch('https://ksys.qfyingshi.cn' + path, {
-            headers: {
-                "Content-Type": 'application/json',
-                "Authorization": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjpudWxsLCJuYW1lIjpudWxsLCJpc3MiOiJ1c2VyIiwiaWQiOjYwLCJ0eXBlIjoiZXhwZXJ0LHB1YmxpY2l6ZSIsImV4cCI6MTcyMzQzMzY4OCwiaWF0IjoxNzIyMTM3Njg4LCJhY2NvdW50IjoiMTg4OTk5OTY2NjYiLCJqdGkiOiI4NjgyNWNlOC0wMTQ4LTQ4ZmEtODA2MS0wYjBjZmRlMzBiYzUifQ.G_K-8HgG8qbwGXmNvdejc8DBNVYCw_J4dIsQ69-zQ1c",
-            },
-            ...options,
-        });
-        const result_1 = await response.text();
-        return JSON.parse(result_1);
+        const response = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (!(response instanceof Response)) {
+            throw new Error('Failed to fetch data.');
+        }
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                history.push('/login');
+                return Promise.reject(new Error('Unauthorized, redirecting to login.'));
+            }
+
+            const errorText = await response.text();
+            Toast.show({
+                icon: 'error',
+                content: errorText
+            })
+            return Promise.reject(new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`));
+        }
+
+        const data = (await response.json()) as T;
+        return data;
     } catch (error) {
-        console.error(path, error);
+        console.error('Fetch error:', error);
+        return Promise.reject(error);
     }
 }

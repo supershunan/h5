@@ -3,6 +3,7 @@ import { List, InfiniteScroll } from 'antd-mobile'
 import React, { useEffect, useState } from 'react'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
+import { BenefitsEnum } from '@/utils/type/global.type'
 
 export default function HistoryIncome() {
     const [historyItems, setHistoryItems] = useState<{ id: number, title: string, content: string }[]>([]);
@@ -24,9 +25,9 @@ export default function HistoryIncome() {
     ])
 
     const loadHistoryItems = async () => {
-        const res = await request('/newApi/moneyLog/pageMy', {
+        const res = await request(`/newApi/moneyLog/pageMy/${BenefitsEnum.persionBenfits}`, {
             method: 'POST',
-            body: JSON.stringify(params),
+            body: params,
         });
         const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
 
@@ -49,16 +50,16 @@ export default function HistoryIncome() {
             <div style={{ padding: '6px' }}>
                 <div style={{ display: 'flex', background: '#fff', fontSize: '15px', fontWeight: '700', textAlign: 'center' }}>
                     <span style={{ flex: '1' }}>日期</span>
-                    <span style={{ flex: '1' }}>视频收益(元)</span>
-                    <span style={{ flex: '1' }}>广告收益(元)</span>
+                    <span style={{ flex: '2' }}>视频收益(元)</span>
+                    {/* <span style={{ flex: '1' }}>广告收益(元)</span> */}
                 </div>
                 <List style={{ '--border-top': '0'}}>
                     {data.map((item, index) => (
                         <List.Item key={index}>
                             <div style={{ display: 'flex', textAlign: 'center' }}>
                                 <span style={{ flex: '1' }}>{item.time}</span>
-                                <span style={{ flex: '1' }}>{item.videoMoney}</span>
-                                <span style={{ flex: '1' }}>{item.advertMoney}</span>
+                                <span style={{ flex: '2' }}>{item.videoMoney}</span>
+                                {/* <span style={{ flex: '1' }}>{item.advertMoney}</span> */}
                             </div>
                         </List.Item>
                     ))}

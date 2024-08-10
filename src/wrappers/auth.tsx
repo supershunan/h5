@@ -1,9 +1,7 @@
 import { Navigate, Outlet } from 'umi';
 
-export default ({ children }) => {
-    //   const { isLogin } = useAuth();
-    const isLogin = window.localStorage.getItem('isLogin');
-    // console.log('no', props);
+export default () => {
+    const isLogin = window.localStorage.getItem('Token');
     if (isLogin) {
         return <Outlet />;
     } else {

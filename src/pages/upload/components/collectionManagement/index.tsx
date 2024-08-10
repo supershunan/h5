@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space } from "antd-mobile";
+import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll } from "antd-mobile";
 import { history } from "umi";
 import { Action } from "antd-mobile/es/components/popover";
 import NavBarBack from "@/components/NavBarBack/NavBarBack";
@@ -15,7 +15,7 @@ import {
 import "./index.less";
 
 export default function CollectionManagement() {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<any[]>([]);
     const [itemData, setItemData] = useState<CollectionItem | undefined>();
     const actions: Action[] = [
         { key: ItemOperateEnum.setting, text: "设置" },
@@ -25,14 +25,44 @@ export default function CollectionManagement() {
     ];
     const [visible, setVisible] = useState(false);
     const [form] = Form.useForm();
+    const [isCollectionUpdate, setIsCollectionUpdate] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [params, setParmas] = useState<{ page: number, rows: number, type: string }>({ page: 1, rows: 5, type: 'folder' });
+    const [isLoad, setIsLoad] = useState(false);
 
     useEffect(() => {
-        getCollectionList();
-    }, []);
+        if (isLoad) {
+            getCollectionList();
+        }
+    }, [params]);
 
     const getCollectionList = async () => {
-        const res = await request("/newApi/works/listFolder", { method: "GET" });
-        if (res.code === RequstStatusEnum.success) setData(res.data);
+        const res = await request("/newApi/works/page", {
+            method: "POST",
+            body: params
+        });
+        const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
+        if (status && !isLoad) {
+            setData([
+                ...data,
+                ...res.rows
+            ]);
+            setParmas({
+                page: params.page + 1,
+                rows: params.rows,
+                type: 'folder'
+            })
+        }
+        if (isLoad) {
+            setData(res.rows);
+            setParmas({
+                page: params.page + 1,
+                rows: params.rows,
+                type: 'folder'
+            });
+            setIsLoad(false);
+        }
+        setHasMore(status)
     };
 
     const getCollectionItem = async (id: number) => {
@@ -43,12 +73,8 @@ export default function CollectionManagement() {
         }
     };
 
-    const updateList = async () => {
-        await getCollectionList();
-    };
-
     const addCollection = async (params: AddFolderParams): Promise<boolean> => {
-        const data = JSON.stringify({
+        const data = {
             title: params.title,
             coverImg:
                 "https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641",
@@ -56,7 +82,7 @@ export default function CollectionManagement() {
             enablePromotion: params.enablePromotion
                 ? PromotionEnum.start
                 : PromotionEnum.end,
-        });
+        };
         const res = await request("/newApi/works/addFolder", {
             method: "POST",
             body: data,
@@ -64,11 +90,9 @@ export default function CollectionManagement() {
         return res.code === RequstStatusEnum.success;
     };
 
-    const deleteCollection = async (ids: number) => {
-        const data = JSON.stringify({ ids });
-        const res = await request("/newApi/works/del", {
-            method: "POST",
-            body: data,
+    const deleteCollection = async (id: number) => {
+        const res = await request(`/newApi/works/removeColl/${id}`, {
+            method: "DELETE",
         });
         Toast.show({
             content: res.code === RequstStatusEnum.success ? "删除成功" : "删除失败",
@@ -76,8 +100,8 @@ export default function CollectionManagement() {
     };
 
     const updateCollection = async (item: CollectionItem) => {
-        const data = JSON.stringify({
-            id: item.id,
+        const data = {
+            id: itemData?.id,
             title: item.title,
             coverImg:
                 "https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641",
@@ -85,11 +109,18 @@ export default function CollectionManagement() {
             enablePromotion: item.enablePromotion
                 ? PromotionEnum.start
                 : PromotionEnum.end,
-        });
+        };
         const res = await request("/newApi/works/update", {
             method: "POST",
             body: data,
         });
+
+        const status = res.code === RequstStatusEnum.success;
+        Toast.show({
+            content: status ? "更新成功" : "更新失败",
+        });
+        setVisible(!status);
+        reload();
     };
 
     const isPromotion = async (id: number, enablePromotion: number) => {
@@ -107,6 +138,7 @@ export default function CollectionManagement() {
             case ItemOperateEnum.setting:
                 await getCollectionItem(item.id);
                 setVisible(true);
+                setIsCollectionUpdate(true);
                 break;
             case ItemOperateEnum.startPromotion:
                 Dialog.show({
@@ -125,7 +157,7 @@ export default function CollectionManagement() {
                                 danger: true,
                                 onClick: async () => {
                                     await isPromotion(item.id, PromotionEnum.start);
-                                    await updateList();
+                                    await reload();
                                 },
                             },
                         ],
@@ -149,7 +181,7 @@ export default function CollectionManagement() {
                                 danger: true,
                                 onClick: async () => {
                                     await isPromotion(item.id, PromotionEnum.end);
-                                    await updateList();
+                                    await reload();
                                 },
                             },
                         ],
@@ -173,7 +205,7 @@ export default function CollectionManagement() {
                                 danger: true,
                                 onClick: async () => {
                                     await deleteCollection(item.id);
-                                    await updateList();
+                                    await reload();
                                 },
                             },
                         ],
@@ -187,7 +219,7 @@ export default function CollectionManagement() {
 
     const goDetail = (item: CollectionItem) => {
         getCollectionItem(item.id); // 获取数据时更新表单
-        history.push(`/collectionManagement/${item.id}?name=${item.name}`);
+        history.push(`/collectionManagement/${item.id}?name=${item.title}`);
     };
 
     const handleAdd = async () => {
@@ -201,7 +233,22 @@ export default function CollectionManagement() {
             form.resetFields();
             setItemData(undefined); // 成功创建后重置 itemData
         }
-        updateList();
+        reload();
+    };
+
+    const resetForm = () => {
+        setItemData(undefined);
+        form.resetFields();
+    }
+
+    const reload =() => {
+        resetForm();
+        setIsLoad(true);
+        setParmas({
+            page: 1,
+            rows: 5,
+            type: 'folder'
+        });
     };
 
     return (
@@ -226,9 +273,9 @@ export default function CollectionManagement() {
                 <div className="floatBtn">
                     <Button
                         onClick={() => {
-                            setItemData(undefined);
-                            form.resetFields();
+                            resetForm();
                             setVisible(true);
+                            setIsCollectionUpdate(false);
                         }}
                         block
                         color="primary"
@@ -240,9 +287,11 @@ export default function CollectionManagement() {
                 <Popup
                     visible={visible}
                     onMaskClick={() => {
+                        resetForm();
                         setVisible(false);
                     }}
                     onClose={() => {
+                        resetForm();
                         setVisible(false);
                     }}
                     showCloseButton
@@ -255,7 +304,7 @@ export default function CollectionManagement() {
                     <div className="createcollection">
                         <Form
                             form={form}
-                            onFinish={handleAdd}
+                            onFinish={isCollectionUpdate ? updateCollection : handleAdd}
                             initialValues={itemData}
                             footer={
                                 <Button block type="submit" color="primary" size="large">
@@ -296,6 +345,7 @@ export default function CollectionManagement() {
                     </div>
                 </Popup>
             </div>
+            <InfiniteScroll loadMore={getCollectionList} hasMore={hasMore} />
         </div>
     );
 }

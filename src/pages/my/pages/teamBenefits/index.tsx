@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
-import { Avatar, Card, List } from 'antd-mobile'
+import React, { useEffect, useState } from 'react'
+import { Avatar, Card, InfiniteScroll, List } from 'antd-mobile'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
+import request from '@/utils/request/request';
+import { RequstStatusEnum } from '@/utils/request/request.type';
+import { BenefitsEnum } from '@/utils/type/global.type'
 
 export default function TeamBenefits() {
-    const [data, setData] = useState([
+    const [data, setData] = useState<any[]>([
         {
             id: 1,
             name: 'test1',
@@ -23,9 +26,32 @@ export default function TeamBenefits() {
             money: '100',
         }
     ])
+    const [hasMore, setHasMore] = useState(true);
+    const [params, setParmas] = useState<{ page: number, rows: number }>({ page: 1, rows: 5 });
     const demoAvatarImages = [
         'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ',
     ]
+
+    const loadHistoryItems = async () => {
+        const res = await request(`/newApi/moneyLog/pageMy/${BenefitsEnum.teamBenfits}`, {
+            method: 'POST',
+            body: params,
+        });
+        const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
+
+        if (status) {
+            setData([
+                ...data,
+                ...res.rows
+            ]);
+            setParmas({
+                page: params.page + 1,
+                rows: params.rows
+            })
+        }
+        setHasMore(status)
+    }
+
     return (
         <div style={{ padding: '46px 0' }}>
             <NavBarBack content={'团队收益'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
@@ -54,6 +80,7 @@ export default function TeamBenefits() {
                     ))}
                 </List>
             </div>
+            <InfiniteScroll loadMore={loadHistoryItems} hasMore={hasMore} />
         </div>
     )
 }

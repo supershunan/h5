@@ -1,52 +1,34 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { history } from 'umi';
-import { Button, Dialog, Modal } from 'antd-mobile'
+import { Button, Dialog, InfiniteScroll, Modal, Toast } from 'antd-mobile'
 import { Action } from 'antd-mobile/es/components/action-sheet'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
 import ContentList from '@/components/ContentList/ContentList'
 import './index.less'
+import request from "@/utils/request/request";
+import { RequstStatusEnum } from "@/utils/request/request.type";
 
 export default function VideoManagement() {
-    const [data, setData] = useState([
-        {
-            id: 0,
-            name: '视频名0',
-        },
-        {
-            id: 1,
-            name: '视频名1',
-        },
-        {
-            id: 1,
-            name: '视频名1',
-        },
-        {
-            id: 1,
-            name: '视频名1',
-        },
-        {
-            id: 1,
-            name: '视频名1',
-        },
-        {
-            id: 1,
-            name: '视频名1',
-        },
-        {
-            id: 1,
-            name: '视频名1',
-        }
-    ])
+    const [data, setData] = useState<any[]>([])
     const actions: Action[] = [
         { key: 0, text: '设置',},
         { key: 1, text: '删除' },
     ]
+    const [hasMore, setHasMore] = useState(true);
+    const [params, setParmas] = useState<{ page: number, rows: number, type: string }>({ page: 1, rows: 5, type: 'video' });
+    const [isLoad, setIsLoad] = useState(false);
 
-    const handlePop = (node, item) => {
+    useEffect(() => {
+        if (isLoad) {
+            loadAllVideoList();
+        }
+    }, [params]);
+
+    const handlePop = (node: Action, item) => {
         console.log(node, item)
         switch (node.key) {
             case 0:
-                console.log('ha')
+                history.push(`/uploadVideo?id=${item.id}&type=edit`);
                 break;
             case 1:
                 Dialog.show({
@@ -63,7 +45,10 @@ export default function VideoManagement() {
                                 text: '删除',
                                 bold: true,
                                 danger: true,
-                                onClick: () => { console.log(item.id, 'delete') }
+                                onClick: () => {
+                                    deleteVideo(item.id);
+                                    reload();
+                                 }
                             },
                         ],
                     ],
@@ -73,6 +58,7 @@ export default function VideoManagement() {
                 break;
         }
     }
+
     const openVideo = (item) => {
         Modal.alert({
             image:
@@ -81,6 +67,60 @@ export default function VideoManagement() {
             content: '请用手机拍摄手持工牌照，注意保持照片清晰',
         })
     }
+
+    const loadAllVideoList = async () => {
+        const res = await request('/newApi/works/page', {
+            method: 'POST',
+            body: params,
+        });
+        const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
+
+        if (status && !isLoad) {
+            setData([
+                ...data,
+                ...res.rows
+            ]);
+            setParmas({
+                page: params.page + 1,
+                rows: params.rows,
+                type: 'video'
+            })
+        }
+
+        if (isLoad) {
+            setData(res.rows);
+            setParmas({
+                page: params.page + 1,
+                rows: params.rows,
+                type: 'video'
+            });
+            setIsLoad(false);
+        }
+        setHasMore(status)
+    }
+
+    const deleteVideo = async (id: number) => {
+        const data = {
+            ids: id,
+        }
+        const res = await request('/newApi/works/del', {
+            method: 'POST',
+            body: data
+        });
+        Toast.show({
+            content: res.code === RequstStatusEnum.success ? "删除成功" : "删除失败",
+        });
+    }
+
+    const reload =() => {
+        setIsLoad(true);
+        setParmas({
+            page: 1,
+            rows: 5,
+            type: 'video'
+        });
+    };
+
     return (
         <div style={{ padding: '46px 0' }}>
             <NavBarBack content={'视频管理'} style={{ background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
@@ -92,6 +132,7 @@ export default function VideoManagement() {
                     </Button>
                 </div>
             </div>
+            <InfiniteScroll loadMore={loadAllVideoList} hasMore={hasMore} />
         </div>
     )
 }

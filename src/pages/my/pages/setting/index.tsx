@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
 import { Footer, Button, Card, Form, ImageUploader, ImageUploadItem, Input, Toast } from 'antd-mobile'
 import './index.less'
@@ -6,6 +6,8 @@ import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function Setting() {
+    const [form] = Form.useForm();
+    const [userInfo, setUserInfo] = useState();
     const [fileList, setFileList] = useState<ImageUploadItem[]>([
         {
             url: 'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
@@ -21,29 +23,26 @@ export default function Setting() {
           href: 'https://www.antgroup.com/',
         },
     ]
-    const [form] = Form.useForm();
 
-    const onFinish = (values: any) => {
+    useEffect(() => {
+        getUserInfo();
+    }, []);
+
+    const onFinish = () => {
         resetUserInfo()
     }
-    function beforeUpload(file: File) {
-        if (file.size > 1024 * 1024) {
-            Toast.show('请选择小于 1M 的图片')
-            return null
-        }
-        return file
-    }
+
     const resetUserInfo = async () => {
         const formValue = form.getFieldsValue();
-        const data1 = JSON.stringify({
-            avatar: "http://dummyimage.com/100x100",
+        const data1 = {
+            avatar: "",
             nickname: formValue.nickname
+        }
+        const res = await request('/newApi/user/updateMyInfo', {
+            method: 'POST',
+            body: data1
         })
-        const data2 = JSON.stringify({ password: formValue.password });
-        // const res = await request('/newApi/user/updateMyInfo', {
-        //     method: 'POST',
-        //     body: data1
-        // })
+        // const data2 = { password: formValue.password };
         // const res2 = await request('/newApi/user/updatePwd', {
         //     method: 'POST',
         //     body: data2
@@ -52,6 +51,14 @@ export default function Setting() {
 
     const onLinkClick = (item: any, index: number) => {
         console.log(item, index);
+    }
+
+    function beforeUpload(file: File) {
+        if (file.size > 1024 * 1024) {
+            Toast.show('请选择小于 1M 的图片')
+            return null
+        }
+        return file
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
@@ -63,12 +70,15 @@ export default function Setting() {
             body: formData,
         }) 
     }
-    const onBinding = () => {
+    const onBinding = () => {}
 
-    }
+    const onExit = () => {}
 
-    const onExit = () => {
-
+    const getUserInfo = async () => {
+        const res = await request('/newApi/user/myInfo', { method: 'GET'});
+        if (res.code === RequstStatusEnum.success) {
+            setUserInfo(res.data)
+        }
     }
 
     return (
@@ -90,16 +100,16 @@ export default function Setting() {
                     }
                 >
                     <Form
-                        name='form'
+                        name="form"
                         form={form}
-                        onFinish={onFinish}
                         layout='horizontal'
+                        initialValues={userInfo}
                     >
                         <Form.Item
                             name='nickname'
                             label='昵称'
                         >
-                            <Input placeholder='请输入' />
+                             <Input placeholder="请输入" />
                         </Form.Item>
                         <Form.Item name='password' label='修改密码'>
                             <Input placeholder='请输入' />

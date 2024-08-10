@@ -1,35 +1,64 @@
-import React, { useState } from 'react'
-import NavBarBack from '@/components/NavBarBack/NavBarBack'
-import { Avatar, Button, Card, Form, ImageUploader, ImageUploadItem, Input, Picker, TextArea } from 'antd-mobile'
+import React, { useEffect, useState } from 'react'
+import { useLocation } from 'umi';
+import { Button, Card, Form, Input, Picker, Popup, TextArea, Toast } from 'antd-mobile'
 import './index.less'
+import NavBarBack from '@/components/NavBarBack/NavBarBack'
+import request from "@/utils/request/request";
+import { RequstStatusEnum } from "@/utils/request/request.type";
 
 export default function withdrawal() {
-    const [fileList, setFileList] = useState<ImageUploadItem[]>([
-        {
-            url: 'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
-        }
-    ])
+    const [form] = Form.useForm();
+    const { search } = useLocation();
+    const params = new URLSearchParams(search);
+    const totalIncome = params.get('totalIncome');
     const [visible, setVisible] = useState(false)
-    const [value, setValue] = useState<(string | null)[]>(['M'])
+    const [value, setValue] = useState<(string | null)[]>([])
     const basicColumns = [
         [
-            { label: '周一', value: 'Mon' },
-            { label: '周二', value: 'Tues' },
-            { label: '周三', value: 'Wed' },
-            { label: '周四', value: 'Thur' },
-            { label: '周五', value: 'Fri' },
+            { label: '支付宝', value: 'ALIPAY' },
         ]
     ]
-    const onFinish = (values: any) => {
-        console.log(values)
+    const [allTotalIncome, setAllTotalIncome] = useState();
+    const [withdrawRules, setWithdrawRules] = useState<{ val: string; }>();
+    const [rulesVisibility, setRulesVisibility] = useState(false);
+
+    useEffect(() => {
+        getWithdrawRule();
+    }, []);
+
+    const getWithdrawRule = async () => {
+        const res = await request('/newApi/gconfig/getWithdrawalRules', { method: 'GET'});
+        res.code === RequstStatusEnum.success && setWithdrawRules(res.data);
     }
-    function beforeUpload(file: File) {
-        if (file.size > 1024 * 1024) {
-            Toast.show('请选择小于 1M 的图片')
-            return null
+
+    const onFinish = () => {
+        startWithdraw()
+    }
+
+    const startWithdraw = async () => {
+        const formValues = form.getFieldsValue();
+        console.log(formValues)
+        const data = {
+            type: formValues.type?.length > 0 ? formValues?.type[0] : 'ALIPAY', //WECHART或ALIPAY 目前只支持 ALIPAY
+            amount: formValues?.amount, //余额单位（元）用户信息 canWithdrawalBalance字段，可提现余额
+            realName: formValues?.realName, //真实姓名 支付宝绑定的
+            account: formValues?.account //支付宝登录账号
         }
-        return file
+        const res = await request('/newApi/withdrawal/doWithdrawal', {
+            method: 'POST',
+            body: data
+        })
+
+        if (res.code === RequstStatusEnum.success) {
+            Toast.show(res.msg);
+            form.resetFields();
+            history.back();
+        } else {
+            Toast.show(`提现失败，${res.msg}`);
+        }
+
     }
+
     return (
         <div style={{ padding: '46px 0' }}>
             <NavBarBack content={'提现'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
@@ -37,19 +66,21 @@ export default function withdrawal() {
                 <Card>
                     <Form
                         name='form'
-                        onFinish={onFinish}
+                        form={form}
                         layout='horizontal'
                     >
-                        <Form.Item name='price' label='提现金额'>
+                        <Form.Item name='amount' label='提现金额'>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Input placeholder='请输入' type='number' />
-                                <Button style={{ width: '150px', fontSize: '13px' }}>
+                                <Input placeholder='请输入' type='number' value={allTotalIncome} />
+                                <Button
+                                onClick={() => setAllTotalIncome(totalIncome) }
+                                style={{ width: '150px', fontSize: '13px' }}>
                                     全部提现
                                 </Button>
                             </div>
                         </Form.Item>
                         <Form.Item
-                            name='collection'
+                            name='type'
                             label='提现方式'
                             trigger='onConfirm'
                             onClick={(e) => {
@@ -83,21 +114,43 @@ export default function withdrawal() {
                             </Picker>
                         </Form.Item>
                         <Form.Item
-                            name='name'
+                            name='realName'
                             label='姓名'
                         >
-                            <Input onChange={console.log} placeholder='请输入' />
+                            <Input placeholder='请输入' />
                         </Form.Item>
-                        <Form.Item name='amount' label='账号'>
-                            <Input onChange={console.log} placeholder='请输入' />
+                        <Form.Item name='account' label='账号'>
+                            <Input placeholder='请输入' />
                         </Form.Item>
                     </Form>
                 </Card>
-                <Card style={{ margin: '10px 0' }}>提现规则</Card>
-                <Button block type='submit' color='primary' size='large'>
+                <Card
+                onClick={() => {
+                    setRulesVisibility(true)
+                }} 
+                style={{ margin: '10px 0' }}>
+                    提现规则
+                </Card>
+                <Button onClick={onFinish} block type='submit' color='primary' size='large'>
                     确认提现
                 </Button>
             </div>
+            <Popup
+                visible={rulesVisibility}
+                onMaskClick={() => {
+                    setRulesVisibility(false)
+                }}
+                onClose={() => {
+                    setRulesVisibility(false)
+                }}
+                bodyStyle={{
+                    borderTopLeftRadius: '8px',
+                    borderTopRightRadius: '8px',
+                    minHeight: '40vh',
+                }}
+                >
+                {withdrawRules?.val}
+            </Popup>
         </div>
     )
 }
