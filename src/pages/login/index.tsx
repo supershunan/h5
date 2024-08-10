@@ -39,6 +39,7 @@ export default function Login() {
         };
         const res = await request('/newApi/auth/regForH5', {
             method: 'POST',
+            skipAuth: true,
             body: data
         });
         return res.code === RequstStatusEnum.success;
@@ -50,6 +51,7 @@ export default function Login() {
         }
         const res = await request('/newApi/auth/sendSms', {
             method: 'POST',
+            skipAuth: true,
             body: data
         })
         Toast.show(res.msg)
@@ -62,6 +64,7 @@ export default function Login() {
         }
         const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
             method: 'POST',
+            skipAuth: true,
             body: data
         })
         if (res.code === RequstStatusEnum.success) {
@@ -77,6 +80,7 @@ export default function Login() {
         }
         const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.phoneLogin}`, {
             method: 'POST',
+            skipAuth: true,
             body: data
         })
         if (res.code === RequstStatusEnum.success) {

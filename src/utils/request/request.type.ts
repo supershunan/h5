@@ -8,4 +8,5 @@ export enum RequstStatusEnum {
 export interface CustomRequestInit extends Omit<RequestInit, 'body'> {
     body?: Object | null;
     timeout?: number;
+    skipAuth?: boolean;
 } 

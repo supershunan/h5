@@ -3,13 +3,15 @@ import { CustomRequestInit } from './request.type';
 import { Toast } from 'antd-mobile';
 
 const BASE_URL = 'https://ksys.qfyingshi.cn';
-const Token = localStorage.getItem('Token') || '';
 
 export default async function request(path: string, options?: CustomRequestInit): Promise<T> {
+    const Token = localStorage.getItem('Token') || '';
     // 请求拦截
-    if (!Token) {
-        history.push('/login');
-        return Promise.reject(new Error('No token found, redirecting to login.'));
+    if (!options?.skipAuth) {
+        if (!Token) {
+            history.push('/login');
+            return Promise.reject(new Error('No token found, redirecting to login.'));
+        }
     }
 
     // 重置 headers

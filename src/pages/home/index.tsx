@@ -69,7 +69,6 @@ export default function Home() {
 	const getPlatformCustomer = async () => {
 		const type = 'customer_service';
 		const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
-		console.log(res)
 		res.code === RequstStatusEnum.success && setPlatformCustomer(res.data[0])
 	}
 
