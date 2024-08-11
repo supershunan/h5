@@ -8,7 +8,7 @@ import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function Setting() {
     const [form] = Form.useForm();
-    const [userInfo, setUserInfo] = useState();
+    const [userInfo, setUserInfo] = useState<{ nickname: string; avatar: string; }>();
     const [fileList, setFileList] = useState<ImageUploadItem[]>([
         {
             url: 'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
@@ -43,11 +43,27 @@ export default function Setting() {
             method: 'POST',
             body: data1
         })
-        // const data2 = { password: formValue.password };
-        // const res2 = await request('/newApi/user/updatePwd', {
-        //     method: 'POST',
-        //     body: data2
-        // })
+        const data2 = { password: formValue.password };
+        const res2 = await request('/newApi/user/updatePwd', {
+            method: 'POST',
+            body: data2
+        })
+
+        Promise.all([res, res2]).then(res => {
+            let isSuccess = true;
+            res.forEach(item => {
+                if (item.code !== RequstStatusEnum.success) {
+                    isSuccess = false;
+                }
+            })
+
+            if (isSuccess) {
+                Toast.show('更新成功');
+                history.back();
+            } else {
+                Toast.show('更新失败');
+            }
+        })
     }
 
     const onLinkClick = (item: any, index: number) => {
@@ -81,6 +97,7 @@ export default function Setting() {
     const getUserInfo = async () => {
         const res = await request('/newApi/user/myInfo', { method: 'GET'});
         if (res.code === RequstStatusEnum.success) {
+            console.log(res.data)
             setUserInfo(res.data)
         }
     }

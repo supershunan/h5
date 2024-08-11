@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll } from "antd-mobile";
+import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem } from "antd-mobile";
 import { history } from "umi";
 import { Action } from "antd-mobile/es/components/popover";
 import NavBarBack from "@/components/NavBarBack/NavBarBack";
@@ -13,9 +13,15 @@ import {
     PromotionEnum,
 } from "./type";
 import "./index.less";
+import { sleep } from "antd-mobile/es/utils/sleep";
 
 export default function CollectionManagement() {
     const [data, setData] = useState<any[]>([]);
+    const [fileList, setFileList] = useState<ImageUploadItem[]>([
+        {
+          url: 'https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641',
+        },
+      ])
     const [itemData, setItemData] = useState<CollectionItem | undefined>();
     const actions: Action[] = [
         { key: ItemOperateEnum.setting, text: "设置" },
@@ -251,6 +257,32 @@ export default function CollectionManagement() {
         });
     };
 
+    const beforeUpload = (file: File, files: File[]) => {
+        // if (file.size > 1024 * 1024) {
+        //   Toast.show('请选择小于 1M 的图片')
+        //   return null
+        // }
+        return file
+    }
+
+    const upload = async (file: File): Promise<ImageUploadItem> => {
+        console.log(file)
+        const formdata = new FormData();
+        formdata.append("file", file);
+
+        await fetch("https://ksys.qfyingshi.cn/apiFile/file/upload", {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('Token') as string
+            },
+            body: formdata,
+        })
+
+        return {
+            url: URL.createObjectURL(file),
+        }
+    }
+
     return (
         <div className="collectionContainer" style={{ padding: "46px 0" }}>
             <NavBarBack
@@ -318,18 +350,18 @@ export default function CollectionManagement() {
                             <Form.Item name="title" label="合集名">
                                 <Input placeholder="请输入" />
                             </Form.Item>
-                            {/* <Form.Item
+                            <Form.Item
                                 name='coverImg'
                                 label='合集封面'
                             >
                                 <ImageUploader
                                     value={fileList}
                                     onChange={setFileList}
-                                    upload={''}
                                     beforeUpload={beforeUpload}
+                                    upload={upload}
                                     maxCount={1}
                                 />
-                            </Form.Item> */}
+                            </Form.Item>
                             <Form.Item name="promotionUrl" label="推广">
                                 <Input placeholder="请输入" />
                             </Form.Item>

@@ -1,12 +1,12 @@
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
 import { List, InfiniteScroll } from 'antd-mobile'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
-import { BenefitsEnum } from '@/utils/type/global.type'
+import { BenefitsEnum, MoneyTypeEnum } from '@/utils/type/global.type'
 
 export default function HistoryIncome() {
-    const [historyItems, setHistoryItems] = useState<{ id: number, title: string, content: string }[]>([]);
+    const [historyItems, setHistoryItems] = useState<{ id: number, money: string, updateTime: string }[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [params, setParmas] = useState<{ page: number, rows: number }>({ page: 1, rows: 5 });
     const [data, setData] = useState([
@@ -32,9 +32,10 @@ export default function HistoryIncome() {
         const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
 
         if (status) {
+            const newData = res.rows.filter(item => item.type === MoneyTypeEnum.income)
             setHistoryItems([
                 ...historyItems,
-                ...res.rows
+                ...newData
             ]);
             setParmas({
                 page: params.page + 1,
@@ -54,11 +55,11 @@ export default function HistoryIncome() {
                     {/* <span style={{ flex: '1' }}>广告收益(元)</span> */}
                 </div>
                 <List style={{ '--border-top': '0'}}>
-                    {data.map((item, index) => (
+                    {historyItems.map((item, index) => (
                         <List.Item key={index}>
                             <div style={{ display: 'flex', textAlign: 'center' }}>
-                                <span style={{ flex: '1' }}>{item.time}</span>
-                                <span style={{ flex: '2' }}>{item.videoMoney}</span>
+                                <span style={{ flex: '1' }}>{item?.updateTime}</span>
+                                <span style={{ flex: '2' }}>{item?.money}</span>
                                 {/* <span style={{ flex: '1' }}>{item.advertMoney}</span> */}
                             </div>
                         </List.Item>

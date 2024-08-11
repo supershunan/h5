@@ -11,7 +11,7 @@ import { CustomizeInfoEnum } from '@/utils/type/global.type';
 
 export default function Home() {
 	const [swipPictures, setSwipPictures] = useState([]);
-	const [advertisementTextlls, setAdvertisementTextlls] = useState('广告栏内容');
+	const [advertisementTextlls, setAdvertisementTextlls] = useState({ val: '广告栏内容' });
 	const [videoSources, setVideoSources] = useState([]);
 	const [platformCustomer, setPlatformCustomer] = useState({ val: 'res'});
 	const BLOCK_CONTENT = [
@@ -56,9 +56,8 @@ export default function Home() {
 	}
 
 	const getAdvertisment = async () => {
-		// const type = 'privacy_policy';
-		// const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.privacyPolicy}`, { method: 'GET' })
-		// res.code === RequstStatusEnum.success && setAdvertisementTextlls()
+		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.advertisement}`, { method: 'GET' })
+		res.code === RequstStatusEnum.success && setAdvertisementTextlls(res.data)
 	}
 
 	const getUseSource = async () => {
@@ -73,7 +72,7 @@ export default function Home() {
 
 	/** 顶部轮播图和广告栏 */
 	const TopContent = useMemo(() => {
-		return <TopSwiper swipPictures={swipPictures} advertisementTextlls={advertisementTextlls} />
+		return <TopSwiper swipPictures={swipPictures} advertisementTextlls={advertisementTextlls?.val} />
 	}, [swipPictures, advertisementTextlls]);
 
 	/** 中间功能模块 */

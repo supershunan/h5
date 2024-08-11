@@ -17,7 +17,7 @@ export default function Promation() {
         const params = {
             page: 1,
             rows: 10,
-            // keyword: value
+            keyword: value
         };
         const queryString = new URLSearchParams(params).toString();
         const res = await request(`/newApi/works/getTaskPageList?${queryString}`, { method: 'GET' });

@@ -12,9 +12,10 @@ export default function TaskDetail() {
     const params = new URLSearchParams(search);
     const name = params.get('name');
     const [copySuccess, setCopySuccess] = useState('');
-    const [promationDetails, setPromationDetails] = useState<{ coverImg?: string; info: string; }>({
+    const [promationDetails, setPromationDetails] = useState<{ coverImg?: string; promotionUrl: string; promotionDetail: string; }>({
         coverImg: 'https://images.unsplash.com/photo-1567945716310-4745a6b7844b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=60',
-        info: '测试'
+        promotionUrl: '',
+        promotionDetail: '',
     });
 
     useEffect(() => {
@@ -46,13 +47,13 @@ export default function TaskDetail() {
                 <Card title="任务详情">
                     <div className={styles.shareUrl}>
                         <div>
-                            <Tag color='success'>{promationDetails?.info}</Tag>
+                            <Tag color='success'>{promationDetails?.promotionUrl}</Tag>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'end' }}>
-                            <Button onClick={() => handleCopy(promationDetails?.info)} color='primary' size='mini'>复制</Button>
+                            <Button onClick={() => handleCopy(promationDetails?.promotionUrl)} color='primary' size='mini'>复制</Button>
                         </div>
                     </div>
-                    <div style={{ marginTop: '20px' }}>{promationDetails?.info}</div>
+                    <div style={{ marginTop: '20px' }}>{promationDetails?.promotionDetail}</div>
                 </Card>
             </div>
         </div>

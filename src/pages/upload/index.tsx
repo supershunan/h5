@@ -8,10 +8,11 @@ import { FolderOutline, UserSetOutline, DownlandOutline, VideoOutline } from 'an
 import styles from './index.less';
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
+import { CustomizeInfoEnum } from '@/utils/type/global.type';
 
 export default function Upload() {
     const [swipPictures, setSwipPictures] = useState([]);
-    const [advertisementTextlls, setAdvertisementTextlls] = useState('广告栏内容');
+    const [advertisementTextlls, setAdvertisementTextlls] = useState({ val: '广告栏内容' });
     const [platformCustomer, setPlatformCustomer] = useState({ val: 'res'});
     const BLOCK_CONTENT = [
         {
@@ -41,6 +42,7 @@ export default function Upload() {
     ]
 
     useEffect(() => {
+        getAdvertisment();
 		getBanner();
         getPlatformCustomer();
 	}, []);
@@ -53,21 +55,19 @@ export default function Upload() {
 	}
 
     const getAdvertisment = async () => {
-		// const type = 'privacy_policy';
-		// const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
-		// res.code === RequstStatusEnum.success && setAdvertisementTextlls()
+		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.advertisement}`, { method: 'GET' })
+		res.code === RequstStatusEnum.success && setAdvertisementTextlls(res.data)
 	}
 
     const getPlatformCustomer = async () => {
-		const type = 'customer_service';
-		const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
+		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.customerService}`, { method: 'GET' })
 		console.log(res)
 		res.code === RequstStatusEnum.success && setPlatformCustomer(res.data[0])
 	}
 
     /** 顶部轮播图和广告栏 */
     const TopContent = useMemo(() => {
-        return <TopSwiper swipPictures={swipPictures} advertisementTextlls={advertisementTextlls} />
+        return <TopSwiper swipPictures={swipPictures} advertisementTextlls={advertisementTextlls?.val} />
     }, [swipPictures, advertisementTextlls]);
 
     /** 中间功能模块 */

@@ -9,7 +9,7 @@ export default function PrivacyPolicy() {
 
     useEffect(() => {
         getUserAgreement();
-    });
+    }, []);
 
     const getUserAgreement = async () => {
         const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.privacyPolicy}`, { method: 'GET' })

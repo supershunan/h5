@@ -3,26 +3,26 @@ import { Avatar, Card, InfiniteScroll, List } from 'antd-mobile'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
-import { BenefitsEnum } from '@/utils/type/global.type'
+import { BenefitsEnum, MoneyTypeEnum } from '@/utils/type/global.type'
 
 export default function TeamBenefits() {
     const [data, setData] = useState<any[]>([
         {
             id: 1,
-            name: 'test1',
-            statu: 1,
+            createBy: 'test1',
+            integer: 1, // 流水方式，1-增加、2-减少
             money: '100',
         },
         {
             id: 2,
-            name: 'test1',
-            statu: 1,
+            createBy: 'test1',
+            integer: 1,
             money: '100',
         },
         {
             id: 3,
-            name: 'test1',
-            statu: 0,
+            createBy: 'test1',
+            integer: 2,
             money: '100',
         }
     ])
@@ -40,9 +40,10 @@ export default function TeamBenefits() {
         const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
 
         if (status) {
+            const newData = res.rows.filter(item => item.type === MoneyTypeEnum.income)
             setData([
                 ...data,
-                ...res.rows
+                ...newData
             ]);
             setParmas({
                 page: params.page + 1,
@@ -62,12 +63,12 @@ export default function TeamBenefits() {
                             <Card>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e1d7d7', marginBottom: '5px' }}>
                                     <span>订单号：{item.id}</span>
-                                    <span style={{ color: 'red' }}>{item.statu ? '已完成' : '未完成'}</span>
+                                    <span style={{ color: 'red' }}>{item?.integer === '1' ? '已完成' : '未完成'}</span>
                                 </div>
                                 <div className="orderItem" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        <Avatar src={demoAvatarImages[0]} />
-                                        <span style={{ marginLeft: '5px'}}>{item.name}</span>
+                                        {/* <Avatar src={demoAvatarImages[0]} /> */}
+                                        <span style={{ marginLeft: '5px'}}>{item.createBy}</span>
                                     </div>
                                     <span>
                                         已得分成：

@@ -9,10 +9,10 @@ export default function UserAgreement() {
 
   useEffect(() => {
     getUserAgreement();
-  });
+  }, []);
 
   const getUserAgreement = async () => {
-		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.customerService}`, { method: 'GET' })
+		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.h5UserProtocol}`, { method: 'GET' })
 		res.code === RequstStatusEnum.success && setUserAgree(res.data[0])
 	}
   return (
