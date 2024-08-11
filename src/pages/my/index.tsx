@@ -44,7 +44,7 @@ export default function Me() {
         {
             name: '邀请链接',
             jumpType: JumpTypeEnum.router,
-            path: '/collectionManagement',
+            path: '',
             icon: <LinkOutline style={{ fontSize: '31px'}} />
         },
         {

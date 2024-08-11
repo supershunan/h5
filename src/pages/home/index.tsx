@@ -7,6 +7,7 @@ import FunctionBlock from '@/components/FunctionBlock/FunctionBlock';
 import { JumpTypeEnum } from '@/components/FunctionBlock/type';
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
+import { CustomizeInfoEnum } from '@/utils/type/global.type';
 
 export default function Home() {
 	const [swipPictures, setSwipPictures] = useState([]);
@@ -56,19 +57,17 @@ export default function Home() {
 
 	const getAdvertisment = async () => {
 		// const type = 'privacy_policy';
-		// const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
+		// const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.privacyPolicy}`, { method: 'GET' })
 		// res.code === RequstStatusEnum.success && setAdvertisementTextlls()
 	}
 
 	const getUseSource = async () => {
-		const type = 'use_video';
-		const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
+		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.useVideo}`, { method: 'GET' })
 		res.code === RequstStatusEnum.success && setVideoSources(res.data)
 	}
 
 	const getPlatformCustomer = async () => {
-		const type = 'customer_service';
-		const res = await request(`/newApi/gconfig/getByType/${type}`, { method: 'GET' })
+		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.customerService}`, { method: 'GET' })
 		res.code === RequstStatusEnum.success && setPlatformCustomer(res.data[0])
 	}
 

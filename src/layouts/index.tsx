@@ -47,7 +47,6 @@ export default function (props) {
   const [activeKey, setActiveKey] = useState('/home');
 
   const setRouteActive = (value: string) => {
-    console.log(value, props)
     setActiveKey(value)
     history.push(value)
   }

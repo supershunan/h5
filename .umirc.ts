@@ -89,6 +89,14 @@ export default defineConfig({
       path: '/teamBenefits',
       component: '@/pages/my/pages/teamBenefits/index.tsx',
     },
+    {
+      path: '/privacyPolicy',
+      component: '@/pages/my/pages/privacyPolicy/index',
+    },
+    {
+      path: '/userAgreement',
+      component: '@/pages/my/pages/userAgreement/index',
+    },
     { path: '/*', component: '@/pages/404', layout: false },
   ],
   npmClient: 'pnpm',

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { history } from 'umi'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
 import { Footer, Button, Card, Form, ImageUploader, ImageUploadItem, Input, Toast } from 'antd-mobile'
 import './index.less'
@@ -16,11 +17,11 @@ export default function Setting() {
     const links = [
         {
           text: '隐私策略',
-          href: 'https://www.aliyun.com/',
+          href: '/privacyPolicy',
         },
         {
           text: '用户协议',
-          href: 'https://www.antgroup.com/',
+          href: '/userAgreement',
         },
     ]
 
@@ -50,7 +51,7 @@ export default function Setting() {
     }
 
     const onLinkClick = (item: any, index: number) => {
-        console.log(item, index);
+        history.push(item.href)
     }
 
     function beforeUpload(file: File) {
@@ -72,7 +73,10 @@ export default function Setting() {
     }
     const onBinding = () => {}
 
-    const onExit = () => {}
+    const onExit = () => {
+        localStorage.removeItem('Token');
+        history.push('/login');
+    }
 
     const getUserInfo = async () => {
         const res = await request('/newApi/user/myInfo', { method: 'GET'});
