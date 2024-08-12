@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { history, useLocation, useParams } from "umi";
-import { ImageUploader, ImageUploadItem, Toast, Picker } from "antd-mobile";
+import { ImageUploader, ImageUploadItem, Toast, Picker, List } from "antd-mobile";
 import { Form, Input, Button, TextArea } from "antd-mobile";
 import "./index.less";
 import request from "@/utils/request/request";
@@ -19,7 +19,8 @@ export default function UploadVideo() {
     const [form] = Form.useForm();
     const [colllectionClassify, setColllectionClassify] = useState<[][]>([]);
     const [videClassify, setVideoClassify] = useState<[][]>([]);
-    const [fileList, setFileList] = useState<ImageUploadItem[]>();
+    const [fileImgList, setFileImgList] = useState<ImageUploadItem[]>();
+    const [fileVideo, setfileVideot] = useState<string>();
     const [videoVisible, setVideoVisible] = useState(false);
     const [colllectionVisible, setColllectionVideoVisible] = useState(false);
     const [videoValue, setVideoValue] = useState<(string | null)[]>(['6']);
@@ -41,13 +42,6 @@ export default function UploadVideo() {
         form.resetFields();
     }, [videoDetail]);
 
-    function beforeUpload(file: File) {
-        if (file.size > 1024 * 1024) {
-            Toast.show("请选择小于 1M 的图片");
-            return null;
-        }
-        return file;
-    }
     const onFinish = async (values: any) => {
         let status;
         if (type === UploadType.edit) {
@@ -91,17 +85,22 @@ export default function UploadVideo() {
     const getVideoDetail = async () => {
         const res = await request(`/newApi/works/getById/${id}`, { method: "GET" });
         res.data.collection = [Number(res.data.pid)];
+        res.data.coverImg = [
+            {
+                url: res.data.coverImg,
+            },
+        ]
         console.log(res.data)
         res.code === RequstStatusEnum.success && setVideoDetail(res.data);
     };
 
     const addVideo = async (values: any): Promise<boolean> => {
+        console.log(values)
         const data = {
             title: values.title, //标题
             info: values.info, //简介
-            coverImg:
-                "https://wx1.sinaimg.cn/mw690/00607PsZgy1hrtf4c3522j31z41z4kjo.jpg", //封面
-            playUrl: "http://fjf.bd/dtylmw", //上传视频的地址
+            coverImg: values.coverImg?.length > 0 ? values.coverImg[0]?.url : '', //封面
+            playUrl: values.playUrl, //上传视频的地址
             collNum: values.collNum, //集数
             pid: id ? id : values.collection[0], //合集的id
             useTime: values.useTime, //购买一次使用的时间，单位 小时
@@ -121,8 +120,8 @@ export default function UploadVideo() {
             id: videoDetail?.id,
             title: values.title,
             info: values.info,
-            coverImg: "https://wx1.sinaimg.cn/mw690/00607PsZgy1hrtf4c3522j31z41z4kjo.jpg",
-            playUrl: "http://cprpmihlfd.il/jqiljsd",
+            coverImg: values.coverImg.length > 0 ? values.coverImg[0]?.url : '',
+            playUrl: values.playUrl,
             collNum: values.collNum,
             pid: values.collection[0],
             useTime: values.useTime,
@@ -135,12 +134,134 @@ export default function UploadVideo() {
         return res.code === RequstStatusEnum.success;
     };
 
+    function beforeUpload(file: File) {
+        return file;
+    }
+
+    const uploadImg = async (file: File): Promise<ImageUploadItem> => {
+        const formdata = new FormData();
+        formdata.append("file", file);
+
+        const res = await fetch("/apiFile/file/upload", {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('Token') as string
+            },
+            body: formdata,
+        })
+        const data = await res.json();
+        return {
+            url: data.data,
+        }
+    }
+
+    const uploadVideo = async (file: File): Promise<ImageUploadItem> => {
+        const formdata = new FormData();
+        formdata.append("file", file);
+
+        const res = await fetch("/apiFile/file/upload", {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('Token') as string
+            },
+            body: formdata,
+        })
+        const data = await res.json();
+        return {
+            url: data.data,
+        }
+    }
+
+    const uploadVideoChange = (url: string): string => {
+        return url;
+    }
+
+    const VideoUploader = ({ upload, onChange, value }) => {
+        const [previewUrl, setPreviewUrl] = useState<string>(value);
+        const [isHidden, setHidden] = useState(false);
+
+        const handleChange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                upload(file).then((data: { url: string; }) => {
+                    console.log(data);
+                    setPreviewUrl(data.url);
+                    setHidden(true)
+                    onChange(data.url)
+                    e.target.value = '';
+                }).catch((error: Error) => {
+                    Toast.show('上传失败，请重试');
+                    console.error('Upload failed:', error);
+                });
+            }
+        };
+
+        const handleRemove = () => {
+            setPreviewUrl('');
+            setHidden(false)
+        };
+
+        return (
+            <div>
+                <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleChange}
+                    id="hiddenFileInput"
+                    style={{ display: 'none' }}
+                />
+                <label htmlFor="hiddenFileInput">
+                    {
+                        !isHidden
+                        && <ImageUploader
+                            disableUpload={true}
+                            maxCount={1}
+                            style={{ width: '100%' }}
+                            upload={function (file: File): Promise<ImageUploadItem> {
+                                throw new Error("Function not implemented.");
+                            }}
+                        />
+                    }
+                </label>
+
+                {previewUrl && (
+                    <div style={{ marginTop: 10, position: 'relative' }}>
+                    <video
+                      src={previewUrl}
+                      controls
+                      style={{ width: '80px', height: '80px' }}
+                    >
+                      您的设备不支持视频播放
+                    </video>
+                    <button
+                      onClick={handleRemove}
+                      style={{
+                        position: 'absolute',
+                        top: '-6px',
+                        right: '13px',
+                        background: 'red',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                )}
+            </div>
+        );
+    };
+
     return (
         <div>
             <Form
                 name="form"
                 form={form}
-                onFinish={ onFinish }
+                onFinish={onFinish}
                 initialValues={videoDetail}
                 footer={
                     <Button block type="submit" color="primary" size="large">
@@ -148,39 +269,36 @@ export default function UploadVideo() {
                     </Button>
                 }
             >
-                {/* <div className="uploadImgVideo">
-                    <Form.Item name='coverImg'>
-                        <div className="upladImg">
+                <div className="uploadImgVideo">
+                    <Form.Item
+                        name='coverImg'
+                        label={
                             <div className='uploadTip'>
                                 <span className='uploadHeadtitle'>上传封面</span>
                                 <span className='uploadSubtitle'>尺寸(750/422)</span>
                             </div>
-                            <ImageUploader
-                                value={fileList}
-                                onChange={setFileList}
-                                upload={''}
-                                beforeUpload={beforeUpload}
-                                maxCount={1}
-                            />
-                        </div>
+                        }
+                    >
+                        <ImageUploader
+                            value={fileImgList}
+                            onChange={setFileImgList}
+                            upload={uploadImg}
+                            beforeUpload={beforeUpload}
+                            maxCount={1}
+                        />
                     </Form.Item>
-                    <Form.Item name='playUrl'>
-                        <div className="upladVideo">
+                    <Form.Item
+                        name='playUrl'
+                        label={
                             <div className='uploadTip'>
                                 <span className='uploadHeadtitle'>上传视频</span>
                                 <span className='uploadSubtitle'>小于200Mb</span>
                             </div>
-                            <ImageUploader
-                                value={fileList}
-                                onChange={setFileList}
-                                upload={''}
-                                beforeUpload={beforeUpload}
-                                maxCount={1}
-                                style={{ width: '100%' }}
-                            />
-                        </div>
+                        }
+                    >
+                        <VideoUploader upload={uploadVideo} onChange={uploadVideoChange} value={fileVideo} />
                     </Form.Item>
-                </div> */}
+                </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Form.Item
                         name="money"
@@ -223,7 +341,6 @@ export default function UploadVideo() {
                             setVideoVisible(false);
                         }}
                         onConfirm={(v) => {
-                            console.log('wkkk', v);
                             setVideoValue(v);
                         }}
                         onSelect={(val, extend) => {
@@ -258,7 +375,6 @@ export default function UploadVideo() {
                             setColllectionVideoVisible(false);
                         }}
                         onConfirm={(v) => {
-                            console.log('wkkk', v);
                             setColllectionValue(v);
                         }}
                         onSelect={(val, extend) => {

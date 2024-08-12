@@ -99,5 +99,15 @@ export default defineConfig({
     },
     { path: '/*', component: '@/pages/404', layout: false },
   ],
+  proxy: {
+    '/apiFile': {
+      'target': 'https://ksys.qfyingshi.cn/',
+      'changeOrigin': true,
+    },
+    '/newApi': {
+      'target': 'https://ksys.qfyingshi.cn/',
+      'changeOrigin': true,
+    },
+  },
   npmClient: 'pnpm',
 });

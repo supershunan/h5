@@ -13,7 +13,6 @@ import {
     PromotionEnum,
 } from "./type";
 import "./index.less";
-import { sleep } from "antd-mobile/es/utils/sleep";
 
 export default function CollectionManagement() {
     const [data, setData] = useState<any[]>([]);
@@ -74,16 +73,21 @@ export default function CollectionManagement() {
     const getCollectionItem = async (id: number) => {
         const res = await request(`/newApi/works/getById/${id}`, { method: "GET" });
         if (res.code === RequstStatusEnum.success) {
+            res.data.coverImg = [
+                {
+                  url: res.data.coverImg,
+                },
+            ]
             setItemData(res.data);
             form.setFieldsValue(res.data); // 更新表单字段的值
         }
     };
 
     const addCollection = async (params: AddFolderParams): Promise<boolean> => {
+        console.log(params)
         const data = {
             title: params.title,
-            coverImg:
-                "https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641",
+            coverImg: params.coverImg.length > 0 ? params.coverImg[0]?.url : '',
             promotionUrl: params.promotionUrl,
             enablePromotion: params.enablePromotion
                 ? PromotionEnum.start
@@ -258,28 +262,27 @@ export default function CollectionManagement() {
     };
 
     const beforeUpload = (file: File, files: File[]) => {
-        // if (file.size > 1024 * 1024) {
-        //   Toast.show('请选择小于 1M 的图片')
-        //   return null
-        // }
+        if (file.size > 1024 * 1024) {
+          Toast.show('请选择小于 1M 的图片')
+          return null
+        }
         return file
     }
 
     const upload = async (file: File): Promise<ImageUploadItem> => {
-        console.log(file)
         const formdata = new FormData();
         formdata.append("file", file);
 
-        await fetch("https://ksys.qfyingshi.cn/apiFile/file/upload", {
+        const res = await fetch("/apiFile/file/upload", {
             method: 'POST',
             headers: {
                 'Authorization': localStorage.getItem('Token') as string
             },
             body: formdata,
         })
-
+        const data = await res.json();
         return {
-            url: URL.createObjectURL(file),
+            url: data.data,
         }
     }
 
