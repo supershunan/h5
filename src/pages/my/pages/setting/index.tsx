@@ -11,7 +11,7 @@ export default function Setting() {
     const [userInfo, setUserInfo] = useState<{ nickname: string; avatar: string; }>();
     const [fileList, setFileList] = useState<ImageUploadItem[]>([
         {
-            url: 'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'
+            url: userInfo?.avatar
         }
     ]);
     const links = [
@@ -36,7 +36,7 @@ export default function Setting() {
     const resetUserInfo = async () => {
         const formValue = form.getFieldsValue();
         const data1 = {
-            avatar: "",
+            avatar: fileList[0].url,
             nickname: formValue.nickname
         }
         const res = await request('/newApi/user/updateMyInfo', {
@@ -79,14 +79,22 @@ export default function Setting() {
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
-        console.log(file)
-        const formData = new FormData();
-        formData.append('file', file);
-        return await request('/apiFile/file/upload', {
+        const formdata = new FormData();
+        formdata.append("file", file);
+
+        const res = await fetch("/apiFile/file/upload", {
             method: 'POST',
-            body: formData,
-        }) 
+            headers: {
+                'Authorization': localStorage.getItem('Token') as string
+            },
+            body: formdata,
+        })
+        const data = await res.json();
+        return {
+            url: data.data,
+        }
     }
+
     const onBinding = () => {}
 
     const onExit = () => {
@@ -112,7 +120,7 @@ export default function Setting() {
                            <ImageUploader
                                 value={fileList}
                                 onChange={setFileList}
-                                upload={''}
+                                upload={uploadImg}
                                 beforeUpload={beforeUpload}
                                 maxCount={1}
                                 style={{ borderRadius: '50px'}}

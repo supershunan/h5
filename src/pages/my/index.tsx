@@ -11,9 +11,6 @@ import { RequstStatusEnum } from '@/utils/request/request.type';
 
 export default function Me() {
     const [userInfo, setUserInfo] = useState();
-    const demoAvatarImages = [
-        'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ',
-    ]
     const BLOCK_CONTENT = [
         {
             name: '工具箱',
@@ -90,7 +87,7 @@ export default function Me() {
             <div style={{ position: 'relative', top: '-50px', padding: '0 6px' }}>
                 <Card>
                     <div className="userInfo">
-                        <Avatar src={demoAvatarImages[0]} style={{ '--size': '64px', borderRadius: '50px' }} />
+                        <Avatar src={userInfo?.avatar} style={{ '--size': '64px', borderRadius: '50px' }} />
                         <div className="info">
                             <div className='nick'>{ userInfo?.nickname ?? '默认昵称' }</div>
                             <div>账号：{ userInfo?.account }</div>
