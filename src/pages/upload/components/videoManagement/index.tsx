@@ -59,12 +59,15 @@ export default function VideoManagement() {
         }
     }
 
-    const openVideo = (item) => {
+    const openVideo = (item: { title: string; playUrl: string | undefined; }) => {
         Modal.alert({
-            image:
-                'https://gw.alipayobjects.com/mdn/rms_efa86a/afts/img/A*SE7kRojatZ0AAAAAAAAAAAAAARQnAQ',
-            title: '手持工牌照示例',
-            content: '请用手机拍摄手持工牌照，注意保持照片清晰',
+            title: item?.title,
+            content: <div>
+                {
+                    item?.playUrl ?  <video style={{ width: '100%', height: '246px' }} src={item?.playUrl} controls></video>
+                    : <span>暂无视频源</span>
+                }
+            </div>,
         })
     }
 

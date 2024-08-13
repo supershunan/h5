@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { history, useLocation, useParams } from "umi";
 import { ImageUploader, ImageUploadItem, Toast, Picker, List } from "antd-mobile";
 import { Form, Input, Button, TextArea } from "antd-mobile";
@@ -212,7 +212,7 @@ export default function UploadVideo() {
                 />
                 <label htmlFor="hiddenFileInput">
                     {
-                        !isHidden
+                        (!isHidden && !previewUrl)
                         && <ImageUploader
                             disableUpload={true}
                             maxCount={1}
@@ -233,28 +233,17 @@ export default function UploadVideo() {
                     >
                       您的设备不支持视频播放
                     </video>
-                    <button
-                      onClick={handleRemove}
-                      style={{
-                        position: 'absolute',
-                        top: '-6px',
-                        right: '13px',
-                        background: 'red',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '50%',
-                        width: '20px',
-                        height: '20px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      &times;
-                    </button>
+                    <span onClick={handleRemove} className="close-btn">&times;</span>
                   </div>
                 )}
             </div>
         );
     };
+
+    const videoUploadEl = useMemo(() => {
+        console.log('Uploading video')
+        return <VideoUploader upload={uploadVideo} onChange={uploadVideoChange} value={fileVideo} />
+    }, [fileVideo])
 
     return (
         <div>
@@ -296,7 +285,8 @@ export default function UploadVideo() {
                             </div>
                         }
                     >
-                        <VideoUploader upload={uploadVideo} onChange={uploadVideoChange} value={fileVideo} />
+                        {/* <VideoUploader upload={uploadVideo} onChange={uploadVideoChange} value={fileVideo} /> */}
+                        {videoUploadEl}
                     </Form.Item>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>

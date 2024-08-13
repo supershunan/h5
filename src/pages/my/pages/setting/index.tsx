@@ -5,23 +5,21 @@ import { Footer, Button, Card, Form, ImageUploader, ImageUploadItem, Input, Toas
 import './index.less'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
+import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 
 export default function Setting() {
     const [form] = Form.useForm();
-    const [userInfo, setUserInfo] = useState<{ nickname: string; avatar: string; }>();
-    const [fileList, setFileList] = useState<ImageUploadItem[]>([
-        {
-            url: userInfo?.avatar
-        }
-    ]);
+    const [visible, setVisible] = useState(false)
+    const [userInfo, setUserInfo] = useState<{ nickname: string }>();
+    const [fileList, setFileList] = useState<ImageUploadItem[]>([{ url: '' }]);
     const links = [
         {
-          text: '隐私策略',
-          href: '/privacyPolicy',
+            text: '隐私策略',
+            href: '/privacyPolicy',
         },
         {
-          text: '用户协议',
-          href: '/userAgreement',
+            text: '用户协议',
+            href: '/userAgreement',
         },
     ]
 
@@ -29,41 +27,57 @@ export default function Setting() {
         getUserInfo();
     }, []);
 
+    useEffect(() => {
+        if (userInfo) {
+            form.setFieldsValue(userInfo);
+        }
+    }, [userInfo]);
+
+    const getUserInfo = async () => {
+        const res = await request('/newApi/user/myInfo', { method: 'GET' });
+        if (res.code === RequstStatusEnum.success) {
+            setUserInfo(res.data)
+            setFileList([{ url: res.data.avatar }])
+        }
+    }
+
     const onFinish = () => {
         resetUserInfo()
     }
 
     const resetUserInfo = async () => {
         const formValue = form.getFieldsValue();
+        console.log(formValue)
+        if ((formValue.password || formValue.passwordCertain) && (formValue.password !== formValue.passwordCertain)) {
+            Toast.show('密码不一致，请检查');
+            return;
+        }
+
         const data1 = {
             avatar: fileList[0].url,
             nickname: formValue.nickname
         }
-        const res = await request('/newApi/user/updateMyInfo', {
+        const updateUserInfo = await request('/newApi/user/updateMyInfo', {
             method: 'POST',
             body: data1
         })
-        const data2 = { password: formValue.password };
-        const res2 = await request('/newApi/user/updatePwd', {
-            method: 'POST',
-            body: data2
-        })
 
-        Promise.all([res, res2]).then(res => {
-            let isSuccess = true;
-            res.forEach(item => {
-                if (item.code !== RequstStatusEnum.success) {
-                    isSuccess = false;
-                }
+        let updatePasswordStatus = true;
+        if (typeof formValue.password === 'string' && typeof formValue.passwordCertain === 'string') {
+            const data2 = { password: formValue.password };
+            const res = await request('/newApi/user/updatePwd', {
+                method: 'POST',
+                body: data2
             })
+            updatePasswordStatus = res.code === RequstStatusEnum.success
+        }
 
-            if (isSuccess) {
-                Toast.show('更新成功');
-                history.back();
-            } else {
-                Toast.show('更新失败');
-            }
-        })
+        if (updateUserInfo.code === RequstStatusEnum.success && updatePasswordStatus) {
+            Toast.show('更新成功');
+            history.back();
+        } else {
+            Toast.show('更新失败');
+        }
     }
 
     const onLinkClick = (item: any, index: number) => {
@@ -95,19 +109,11 @@ export default function Setting() {
         }
     }
 
-    const onBinding = () => {}
+    const onBinding = () => { }
 
     const onExit = () => {
         localStorage.removeItem('Token');
         history.push('/login');
-    }
-
-    const getUserInfo = async () => {
-        const res = await request('/newApi/user/myInfo', { method: 'GET'});
-        if (res.code === RequstStatusEnum.success) {
-            console.log(res.data)
-            setUserInfo(res.data)
-        }
     }
 
     return (
@@ -117,34 +123,51 @@ export default function Setting() {
                 <Card
                     title={
                         <div className='advator'>
-                           <ImageUploader
+                            <ImageUploader
                                 value={fileList}
                                 onChange={setFileList}
                                 upload={uploadImg}
                                 beforeUpload={beforeUpload}
                                 maxCount={1}
-                                style={{ borderRadius: '50px'}}
+                                style={{ borderRadius: '50px' }}
                             />
                         </div>
                     }
                 >
-                    <Form
-                        name="form"
-                        form={form}
-                        layout='horizontal'
-                        initialValues={userInfo}
-                    >
-                        <Form.Item
-                            name='nickname'
-                            label='昵称'
-                        >
-                             <Input placeholder="请输入" />
-                        </Form.Item>
-                        <Form.Item name='password' label='修改密码'>
-                            <Input placeholder='请输入' />
-                        </Form.Item>
-                    </Form>
+                    <div></div>
                 </Card>
+                <Form
+                    name="form"
+                    form={form}
+                    layout='horizontal'
+                    initialValues={userInfo}
+                >
+                    <Form.Item name='nickname' label='昵称'>
+                        <Input placeholder="请输入" />
+                    </Form.Item>
+                    <Form.Item name='password' label='修改密码' extra={
+                        <div className='eye'>
+                            {!visible ? (
+                                <EyeInvisibleOutline onClick={() => setVisible(true)} />
+                            ) : (
+                                <EyeOutline onClick={() => setVisible(false)} />
+                            )}
+                        </div>
+                    }>
+                        <Input placeholder='请输入' type={visible ? 'text' : 'password'} />
+                    </Form.Item>
+                    <Form.Item name='passwordCertain' label='确认密码' extra={
+                        <div className='eye'>
+                            {!visible ? (
+                                <EyeInvisibleOutline onClick={() => setVisible(true)} />
+                            ) : (
+                                <EyeOutline onClick={() => setVisible(false)} />
+                            )}
+                        </div>
+                    }>
+                        <Input placeholder='请输入' type={visible ? 'text' : 'password'} />
+                    </Form.Item>
+                </Form>
                 <Button onClick={onFinish} block type='submit' color='primary' size='large' style={{ marginTop: '10px' }}>
                     提交
                 </Button>
