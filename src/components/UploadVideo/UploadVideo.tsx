@@ -84,14 +84,16 @@ export default function UploadVideo() {
 
     const getVideoDetail = async () => {
         const res = await request(`/newApi/works/getById/${id}`, { method: "GET" });
-        res.data.collection = [Number(res.data.pid)];
-        res.data.coverImg = [
-            {
-                url: res.data.coverImg,
-            },
-        ]
-        console.log(res.data)
-        res.code === RequstStatusEnum.success && setVideoDetail(res.data);
+        if (res.code === RequstStatusEnum.success && res.data) {
+            res.data.collection = [Number(res.data.pid)];
+            res.data.coverImg = [
+                {
+                    url: res.data.coverImg,
+                },
+            ]
+            console.log(res.data)
+            res.code === RequstStatusEnum.success && setVideoDetail(res.data);
+        }
     };
 
     const addVideo = async (values: any): Promise<boolean> => {
