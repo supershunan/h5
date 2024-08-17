@@ -8,6 +8,7 @@ import './index.less';
 import '@/pages/global.less';
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
+import { md5 } from 'js-md5';
 
 export default function Login() {
     const [currentStatus, setCurrentStatus] = useState(StatusEnum.phoneLogin);
@@ -33,7 +34,7 @@ export default function Login() {
     const register = async (values: any): Promise<boolean> => {
         const data = {
             account: values.account,
-            password: values.password, //密码md5加密
+            password: md5(values.password), //密码md5加密
             smsCode: values.smsCode,//短信验证码
             // pid: null //推荐人id，如果推荐人不为空，则要传到后台，如果推荐人不是团长会返回请求非法
         };
@@ -60,7 +61,7 @@ export default function Login() {
     const pwLogin = async (values: any): Promise<boolean> => {
         const data = {
             account: values.account,
-            password: values.password
+            password: md5(values.password)
         }
         const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
             method: 'POST',

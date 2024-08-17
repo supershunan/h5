@@ -6,6 +6,7 @@ import './index.less'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
+import { md5 } from 'js-md5';
 
 export default function Setting() {
     const [form] = Form.useForm();
@@ -64,7 +65,7 @@ export default function Setting() {
 
         let updatePasswordStatus = true;
         if (typeof formValue.password === 'string' && typeof formValue.passwordCertain === 'string') {
-            const data2 = { password: formValue.password };
+            const data2 = { password: md5(formValue.password) };
             const res = await request('/newApi/user/updatePwd', {
                 method: 'POST',
                 body: data2

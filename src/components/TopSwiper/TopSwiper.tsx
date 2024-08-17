@@ -8,7 +8,7 @@ export const TopSwiper = (props: TopSwiperProps) => {
 
     const items = useMemo(() => swipPictures.map(item => (
         <Swiper.Item key={item.id}>
-            <Image src={item.val} fit='fill' />
+            <Image src={item.val} fit='fill' height={211} />
         </Swiper.Item>
     )), [swipPictures]);
 
