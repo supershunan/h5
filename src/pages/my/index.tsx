@@ -91,7 +91,6 @@ export default function Me() {
                         <div className="info">
                             <div className='nick'>{ userInfo?.nickname ?? '默认昵称' }</div>
                             <div>账号：{ userInfo?.account }</div>
-                            <div>{ userInfo?.nickname ?? '默认昵称' }</div>
                         </div>
                     </div>
                 </Card>

@@ -146,26 +146,38 @@ export default function Setting() {
                     <Form.Item name='nickname' label='昵称'>
                         <Input placeholder="请输入" />
                     </Form.Item>
-                    <Form.Item name='password' label='修改密码' extra={
+                    <Form.Item
+                        name='password'
+                        label='修改密码'
+                        extra={
                         <div className='eye'>
                             {!visible ? (
                                 <EyeInvisibleOutline onClick={() => setVisible(true)} />
                             ) : (
                                 <EyeOutline onClick={() => setVisible(false)} />
                             )}
-                        </div>
-                    }>
+                        </div>}
+                        rules={[
+                            { type: 'string', min: 6 },
+                        ]}
+                    >
                         <Input placeholder='请输入' type={visible ? 'text' : 'password'} />
                     </Form.Item>
-                    <Form.Item name='passwordCertain' label='确认密码' extra={
+                    <Form.Item
+                        name='passwordCertain'
+                        label='确认密码'
+                        extra={
                         <div className='eye'>
                             {!visible ? (
                                 <EyeInvisibleOutline onClick={() => setVisible(true)} />
                             ) : (
                                 <EyeOutline onClick={() => setVisible(false)} />
                             )}
-                        </div>
-                    }>
+                        </div>}
+                        rules={[
+                            { type: 'string', min: 6 },
+                        ]}
+                    >
                         <Input placeholder='请输入' type={visible ? 'text' : 'password'} />
                     </Form.Item>
                 </Form>

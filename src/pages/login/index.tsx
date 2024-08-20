@@ -10,6 +10,7 @@ import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
 import { md5 } from 'js-md5';
 
+const COUNT_TIME = 120;
 export default function Login() {
     const [currentStatus, setCurrentStatus] = useState(StatusEnum.phoneLogin);
     const statusText = useRef([
@@ -29,6 +30,9 @@ export default function Login() {
     const [visible, setVisible] = useState(false)
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const [countTime, setCountTime] = useState<number>(COUNT_TIME);
+    const [showTime, setShowTime] = useState(false);
+    const timeInterval = useRef(-1);
 
 
     const register = async (values: any): Promise<boolean> => {
@@ -91,8 +95,30 @@ export default function Login() {
     }
 
     const sendCode = async () => {
+        if (countTime < COUNT_TIME) {
+            Toast.show('禁止频繁获取验证码')
+            return;
+        }
         const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();
         await sendSms(values?.account as number);
+        setShowTime(true);
+        const baseTime = countTime;
+        let count = 1;
+        timeInterval.current = setInterval(() => {
+            const time = baseTime - count;
+            if (time === -1) {
+                // 需要清除上一次的倒计时
+                clearInterval(timeInterval.current);
+            } else {
+                if (time === 0) {
+                    setCountTime(COUNT_TIME);
+                    setShowTime(false);
+                } else {
+                    setCountTime(time);
+                }
+            }
+            count++;
+        }, 1000);
     }
 
     const handleGo = (key: number) => {
@@ -175,7 +201,14 @@ export default function Login() {
                     fit='cover'
                 />
                 <Form form={form} layout='horizontal'>
-                    <Form.Item label='手机号' name='account'>
+                    <Form.Item
+                        label='手机号'
+                        name='account'
+                        rules={[
+                            { required: true },
+                            { type: 'string', min: 11 },
+                        ]}
+                    >
                         <Input placeholder='请输入' clearable />
                     </Form.Item>
                     {
@@ -185,9 +218,12 @@ export default function Login() {
                             name='smsCode'
                             extra={
                                 <div className='extraPart' onClick={sendCode}>
-                                    <a>发送验证码</a>
+                                    <a>{showTime && countTime}发送验证码</a>
                                 </div>
                             }
+                            rules={[
+                                { required: true },
+                            ]}
                         >
                             <Input placeholder='请输入' clearable />
                         </Form.Item>
@@ -197,6 +233,10 @@ export default function Login() {
                         <Form.Item
                             label='密码'
                             name='password'
+                            rules={[
+                                { required: true },
+                                { type: 'string', min: 6 },
+                            ]}
                             extra={
                                 <div className='eye'>
                                     {!visible ? (

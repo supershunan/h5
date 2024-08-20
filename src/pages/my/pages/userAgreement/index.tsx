@@ -18,10 +18,7 @@ export default function UserAgreement() {
   return (
     <div style={{ padding: '46px 0'}}>
         <NavBarBack content={'用户协议'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-        用户协议
-        <div>
-          {userAgree?.val}
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: userAgree?.val }} />
     </div>
   )
 }

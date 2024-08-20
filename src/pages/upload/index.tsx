@@ -61,7 +61,6 @@ export default function Upload() {
 
     const getPlatformCustomer = async () => {
 		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.customerService}`, { method: 'GET' })
-		console.log(res)
 		res.code === RequstStatusEnum.success && setPlatformCustomer(res.data[0])
 	}
 

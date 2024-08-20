@@ -18,10 +18,7 @@ export default function PrivacyPolicy() {
     return (
         <div style={{ padding: '46px 0' }}>
             <NavBarBack content={'隐私政策'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-            隐私政策
-            <div>
-                {privacyPolicy?.val}
-            </div>
+            <div dangerouslySetInnerHTML={{ __html: privacyPolicy?.val }} />
         </div>
     )
 }

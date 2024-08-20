@@ -16,6 +16,8 @@ export enum CustomizeInfoEnum {
     advertisement = 'advertisement',
     /** 用户协议 */
     h5UserProtocol = 'h5_user_protocol',
+    /** 工具箱 */
+    tools = 'tools',
 }
 
 export enum MoneyTypeEnum {

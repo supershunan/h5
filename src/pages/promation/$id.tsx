@@ -53,7 +53,9 @@ export default function TaskDetail() {
                             <Button onClick={() => handleCopy(promationDetails?.promotionUrl)} color='primary' size='mini'>复制</Button>
                         </div>
                     </div>
-                    <div style={{ marginTop: '20px' }}>{promationDetails?.promotionDetail}</div>
+                    <div style={{ marginTop: '20px' }}>
+                        <div dangerouslySetInnerHTML={{ __html: promationDetails?.promotionDetail }} />
+                    </div>
                 </Card>
             </div>
         </div>
