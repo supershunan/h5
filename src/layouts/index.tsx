@@ -53,7 +53,7 @@ export default function (props) {
 
 
   return (
-    <div>
+    <div className='container'>
       <Outlet />
       <div className={styles.bottomTabbar}>
         <TabBar activeKey={activeKey} onChange={value => setRouteActive(value)}>

@@ -291,6 +291,7 @@ export default function CollectionManagement() {
             <NavBarBack
                 content={"合集管理"}
                 style={{
+                    maxWidth: '450px',
                     background: "#f8f8fb",
                     position: "fixed",
                     top: "0",
@@ -334,6 +335,7 @@ export default function CollectionManagement() {
                         borderTopLeftRadius: "8px",
                         borderTopRightRadius: "8px",
                         minHeight: "40vh",
+                        maxWidth: '450px'
                     }}
                 >
                     <div className="createcollection">

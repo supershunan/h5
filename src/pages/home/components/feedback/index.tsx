@@ -34,7 +34,7 @@ export default function FeedBack() {
 
     return (
         <div className={styles.feedbackContainer}>
-            <NavBarBack content={'意见反馈'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <NavBarBack content={'意见反馈'} style={{ maxWidth: '450px', background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div className={styles.feedbackbg}>
             </div>
             <Image

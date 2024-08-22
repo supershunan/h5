@@ -55,7 +55,7 @@ export default function TeamBenefits() {
 
     return (
         <div style={{ padding: '46px 0' }}>
-            <NavBarBack content={'团队收益'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <NavBarBack content={'团队收益'} style={{ maxWidth: '450px', background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div style={{ padding: '6px' }}>
                 <List style={{ '--border-top': '0' }}>
                     {data.map((item, index) => (

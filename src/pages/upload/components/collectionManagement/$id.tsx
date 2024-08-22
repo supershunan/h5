@@ -132,7 +132,7 @@ export default function Id() {
 
     return (
         <div style={{ padding: '46px 0' }}>
-            <NavBarBack content={name as string} style={{ background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <NavBarBack content={name as string} style={{ maxWidth: '450px', background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div style={{ padding: '6px 6px' }}>
                 <ContentList contentList={data} actions={actions} handlePop={handlePop} handleItem={openVideo} />
                 <div className={styles.floatBtn}>

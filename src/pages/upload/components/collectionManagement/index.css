@@ -5,3 +5,8 @@
     left: 50%;
     transform: translateX(-50%);
 }
+@media (min-width: 450px) {
+    .floatBtn {
+        width: 300px;
+    }
+}

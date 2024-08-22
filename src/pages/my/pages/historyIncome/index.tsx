@@ -47,7 +47,7 @@ export default function HistoryIncome() {
 
     return (
         <div style={{ padding: '46px 0' }}>
-            <NavBarBack content={'历史收益'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <NavBarBack content={'历史收益'} style={{ maxWidth: '450px', background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div style={{ padding: '6px' }}>
                 <div style={{ display: 'flex', background: '#fff', fontSize: '15px', fontWeight: '700', textAlign: 'center' }}>
                     <span style={{ flex: '1' }}>日期</span>

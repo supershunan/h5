@@ -36,7 +36,7 @@ export default function HistoryNotice() {
 
     return (
         <div className={styles.historyContainer}>
-            <NavBarBack content={'历史公告'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <NavBarBack content={'历史公告'} style={{ maxWidth: '450px', background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <List header='历史公告'>
                 {
                     historyItems.map(item => <List.Item key={item.id} onClick={() => noticeDetail(item.content)} arrowIcon={<div style={{color: '#3086ff'}}>查看</div>}>{item.title}</List.Item>)

@@ -1,0 +1,26 @@
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.container {
+    max-width: 450px;
+    height: 100%;
+    margin: 0 auto;
+    position: relative; /* 关键 */
+}
+
+@media (min-width: 450px) {
+    .container {
+        border: 1px solid #ccc;
+    }
+    .container .floatBtn {
+        width: 300px;
+    }
+}
+  

@@ -61,7 +61,7 @@ export default function withdrawal() {
 
     return (
         <div style={{ padding: '46px 0' }}>
-            <NavBarBack content={'提现'} style={{ background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
+            <NavBarBack content={'提现'} style={{ maxWidth: '450px', background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div style={{ padding: '0 6px', marginTop: '20px' }}>
                 <Card>
                     <Form

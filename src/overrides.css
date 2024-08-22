@@ -1,0 +1,14 @@
+@media (min-width: 450px) {
+    .adm-popup-body-position-bottom {
+        left: 50%;
+        transform: translate(-50%, 0) !important;
+    }
+
+    .adm-picker-popup .adm-popup-body {
+        max-width: 450px;
+    }
+
+    .collectionContainer .collectContent .floatBtn {
+        width: 300px;
+    }
+}
