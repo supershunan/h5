@@ -3,7 +3,7 @@ import { Avatar, Button, Card, Divider, Image, Space } from 'antd-mobile'
 import BgImg from '@/assets/images/welcome.jpg'
 import FunctionBlock from '@/components/FunctionBlock/FunctionBlock';
 import { JumpTypeEnum } from '@/components/FunctionBlock/type';
-import { AppstoreOutline, GlobalOutline, SetOutline, PayCircleOutline, LinkOutline, ReceiptOutline } from 'antd-mobile-icons';
+import { AppstoreOutline, GlobalOutline, SetOutline, PayCircleOutline, LinkOutline, ReceiptOutline, RightOutline } from 'antd-mobile-icons';
 import './index.less'
 import { history } from 'umi';
 import request from '@/utils/request/request';
@@ -87,10 +87,15 @@ export default function Me() {
             <div style={{ position: 'relative', top: '-50px', padding: '0 6px' }}>
                 <Card>
                     <div className="userInfo">
-                        <Avatar src={userInfo?.avatar} style={{ '--size': '64px', borderRadius: '50px' }} />
-                        <div className="info">
-                            <div className='nick'>{ userInfo?.nickname ?? '默认昵称' }</div>
-                            <div>账号：{ userInfo?.account }</div>
+                        <div style={{ display: 'flex', alignItems: 'center'}}>
+                            <Avatar src={userInfo?.avatar} style={{ '--size': '64px', borderRadius: '50px' }} />
+                            <div className="info">
+                                <div className='nick'>{ userInfo?.nickname ?? '默认昵称' }</div>
+                                <div>账号：{ userInfo?.account }</div>
+                            </div>
+                        </div>
+                        <div style={{ fontSize: '25px'}} onClick={() => history.push('/userInfo')}>
+                            <RightOutline />
                         </div>
                     </div>
                 </Card>

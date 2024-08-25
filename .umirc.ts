@@ -78,6 +78,10 @@ export default defineConfig({
       component: '@/pages/my/pages/userAgreement/index.tsx',
     },
     {
+      path: '/userInfo',
+      component: '@/pages/my/pages/userInfo/index.tsx',
+    },
+    {
       path: '/setting',
       component: '@/pages/my/pages/setting/index.tsx',
     },
