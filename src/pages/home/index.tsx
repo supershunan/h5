@@ -57,7 +57,9 @@ export default function Home() {
 
 	const getAdvertisment = async () => {
 		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.advertisement}`, { method: 'GET' })
-		res.code === RequstStatusEnum.success && setAdvertisementTextlls(res.data)
+		if (res.code === RequstStatusEnum.success && res.data.length) {
+			setAdvertisementTextlls(res.data[0])
+		}
 	}
 
 	const getUseSource = async () => {

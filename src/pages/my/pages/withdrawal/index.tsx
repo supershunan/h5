@@ -26,6 +26,14 @@ export default function withdrawal() {
         getWithdrawRule();
     }, []);
 
+    const allWithDrawal = () => {
+        form.setFieldsValue({
+            ...form.getFieldsValue(),
+            amount: totalIncome
+        })
+        setAllTotalIncome(totalIncome);
+    }
+
     const getWithdrawRule = async () => {
         const res = await request('/newApi/gconfig/getWithdrawalRules', { method: 'GET'});
         res.code === RequstStatusEnum.success && setWithdrawRules(res.data);
@@ -37,7 +45,7 @@ export default function withdrawal() {
 
     const startWithdraw = async () => {
         const formValues = form.getFieldsValue();
-        console.log(formValues)
+        console.log(formValues, allTotalIncome)
         const data = {
             type: formValues.type?.length > 0 ? formValues?.type[0] : 'ALIPAY', //WECHART或ALIPAY 目前只支持 ALIPAY
             amount: formValues?.amount, //余额单位（元）用户信息 canWithdrawalBalance字段，可提现余额
@@ -73,7 +81,7 @@ export default function withdrawal() {
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Input placeholder='请输入' type='number' value={allTotalIncome} />
                                 <Button
-                                onClick={() => setAllTotalIncome(totalIncome) }
+                                onClick={allWithDrawal}
                                 style={{ width: '150px', fontSize: '13px' }}>
                                     全部提现
                                 </Button>

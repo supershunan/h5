@@ -63,10 +63,6 @@ export default function Me() {
         return <FunctionBlock blockContent={BLOCK_CONTENT2} style={{ padding: '0 6px' }} />
     }, [BLOCK_CONTENT2]);
 
-    const goHistoryIncom = () => {
-        history.push('/historyIncome')
-    }
-
     const goWithdrawal = () => {
         history.push(`/withdrawal?totalIncome=${userInfo?.totalIncome}`)
     }
@@ -121,9 +117,12 @@ export default function Me() {
                 <Card>
                     {functionBlock}
                 </Card>
-                <Card title='团长专属' style={{ marginTop: '20px' }}>
-                    {leaderFunctionBlock}
-                </Card>
+                {
+                    userInfo?.type.split(',').includes('commander')
+                    &&  <Card title='团长专属' style={{ marginTop: '20px' }}>
+                        {leaderFunctionBlock}
+                    </Card>
+                }
             </div>
         </div>
     )

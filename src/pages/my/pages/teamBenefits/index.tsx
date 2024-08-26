@@ -7,24 +7,24 @@ import { BenefitsEnum, MoneyTypeEnum } from '@/utils/type/global.type'
 
 export default function TeamBenefits() {
     const [data, setData] = useState<any[]>([
-        {
-            id: 1,
-            createBy: 'test1',
-            integer: 1, // 流水方式，1-增加、2-减少
-            money: '100',
-        },
-        {
-            id: 2,
-            createBy: 'test1',
-            integer: 1,
-            money: '100',
-        },
-        {
-            id: 3,
-            createBy: 'test1',
-            integer: 2,
-            money: '100',
-        }
+        // {
+        //     id: 1,
+        //     createBy: 'test1',
+        //     integer: 1, // 流水方式，1-增加、2-减少
+        //     money: '100',
+        // },
+        // {
+        //     id: 2,
+        //     createBy: 'test1',
+        //     integer: 1,
+        //     money: '100',
+        // },
+        // {
+        //     id: 3,
+        //     createBy: 'test1',
+        //     integer: 2,
+        //     money: '100',
+        // }
     ])
     const [hasMore, setHasMore] = useState(true);
     const [params, setParmas] = useState<{ page: number, rows: number }>({ page: 1, rows: 5 });
@@ -61,10 +61,10 @@ export default function TeamBenefits() {
                     {data.map((item, index) => (
                         <List.Item key={index}>
                             <Card>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e1d7d7', marginBottom: '5px' }}>
+                                {/* <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e1d7d7', marginBottom: '5px' }}>
                                     <span>订单号：{item.id}</span>
                                     <span style={{ color: 'red' }}>{item?.integer === '1' ? '已完成' : '未完成'}</span>
-                                </div>
+                                </div> */}
                                 <div className="orderItem" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         {/* <Avatar src={demoAvatarImages[0]} /> */}
