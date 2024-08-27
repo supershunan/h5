@@ -11,7 +11,7 @@ import { CustomizeInfoEnum } from '@/utils/type/global.type';
 
 export default function Home() {
 	const [swipPictures, setSwipPictures] = useState([]);
-	const [advertisementTextlls, setAdvertisementTextlls] = useState({ val: '广告栏内容' });
+	const [advertisementTextlls, setAdvertisementTextlls] = useState({ content: '广告栏内容' });
 	const [videoSources, setVideoSources] = useState([]);
 	const [platformCustomer, setPlatformCustomer] = useState({ val: 'res'});
 	const BLOCK_CONTENT = [
@@ -56,9 +56,12 @@ export default function Home() {
 	}
 
 	const getAdvertisment = async () => {
-		const res = await request(`/newApi/gconfig/getByType/${CustomizeInfoEnum.advertisement}`, { method: 'GET' })
-		if (res.code === RequstStatusEnum.success && res.data.length) {
-			setAdvertisementTextlls(res.data[0])
+		const res = await request('/newApi/noticeList/page', {
+			method: 'post',
+			body: { page: 1, rows: 5 }
+		})
+		if (res.code === RequstStatusEnum.success && res.rows.length) {
+			setAdvertisementTextlls(res.rows[0])
 		}
 	}
 
@@ -74,7 +77,7 @@ export default function Home() {
 
 	/** 顶部轮播图和广告栏 */
 	const TopContent = useMemo(() => {
-		return <TopSwiper swipPictures={swipPictures} advertisementTextlls={advertisementTextlls?.val} />
+		return <TopSwiper swipPictures={swipPictures} advertisementTextlls={advertisementTextlls?.content} />
 	}, [swipPictures, advertisementTextlls]);
 
 	/** 中间功能模块 */

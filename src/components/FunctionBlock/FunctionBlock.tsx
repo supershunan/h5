@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { history } from 'umi';
+import { history, useLocation } from 'umi';
 import { Modal, Card } from 'antd-mobile';
 import { BankcardOutline, UserSetOutline, DownlandOutline, FileOutline } from 'antd-mobile-icons';
 import styles from './index.less';
@@ -13,8 +13,12 @@ export default function FunctionBlock(props: FunctionBlockProps) {
         } else if (type === JumpTypeEnum['modal']) {
             Modal.show({
                 image: content,
-                // title: '扫码联系客服',
-                // content: '请用手机拍摄手持工牌照，注意保持照片清晰',
+                closeOnMaskClick: true,
+            })
+        } else if (type === JumpTypeEnum['copy']) {
+            Modal.show({
+               title: '请复制到浏览器打开',
+               content: window.location.origin + `/login?id=${content}`,
                 closeOnMaskClick: true,
             })
         }

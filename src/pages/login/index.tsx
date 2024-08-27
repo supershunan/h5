@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'umi';
+import { useLocation, useNavigate } from 'umi';
 import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { StatusEnum, PhoneLogin, Registor, PwLogin, LoginTypeEnum } from './index.type';
@@ -12,6 +12,9 @@ import { md5 } from 'js-md5';
 
 const COUNT_TIME = 120;
 export default function Login() {
+    const { search } = useLocation();
+    const urlParams = new URLSearchParams(search);
+    const id = urlParams.get("id");
     const [currentStatus, setCurrentStatus] = useState(StatusEnum.phoneLogin);
     const statusText = useRef([
         {
@@ -128,8 +131,10 @@ export default function Login() {
     const handleLoginOrRegidter = async () => {
         let status;
         const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();
-        console.log(values);
         if (currentStatus === StatusEnum.register) {
+            if (id) {
+                values.pid = id;
+            }
             status = await register(values);
             if (status) {
                 Toast.show({

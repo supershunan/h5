@@ -1,7 +1,7 @@
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
 import { useParams, useLocation, history } from 'umi'
 import React, { useEffect, useState } from 'react'
-import { Button, Card, Tag, Image } from 'antd-mobile';
+import { Button, Card, Tag, Image, Modal } from 'antd-mobile';
 import styles from './index.css'
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
@@ -23,15 +23,20 @@ export default function TaskDetail() {
     }, []);
 
     const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text).then(
-            () => {
-                setCopySuccess('复制成功!');
-            },
-            (err) => {
-                setCopySuccess('复制失败!');
-                console.error('复制失败!', err);
-            }
-        );
+        Modal.show({
+            title: '请复制下方内容',
+            content: text,
+            closeOnMaskClick: true,
+         })
+        // navigator.clipboard.writeText(text).then(
+        //     () => {
+        //         setCopySuccess('复制成功!');
+        //     },
+        //     (err) => {
+        //         setCopySuccess('复制失败!');
+        //         console.error('复制失败!', err);
+        //     }
+        // );
     }
 
     const getPromationDetail = async () => {

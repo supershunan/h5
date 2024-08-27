@@ -1,16 +1,42 @@
 import React from 'react';
-import { NavBar, Form, Button, TextArea, Input, Stepper, Dialog, Image } from 'antd-mobile';
+import { NavBar, Form, Button, TextArea, Input, Stepper, Dialog, Image, Toast } from 'antd-mobile';
 import styles from './index.less';
 import feedBackBg from '@/assets/images/cooperation.jpg';
+import { RequstStatusEnum } from '@/utils/request/request.type';
+import request from '@/utils/request/request';
 
 export default function Cooperation() {
+    const [form] = Form.useForm();
     const back = () => {
         history.back();
     }
 
-    const onFinish = (values: any) => {
-        console.log(values)
+    const onFinish = async (values: any) => {
+        const data = values;
+        const res = await request('/newApi/feedback/add', {
+            method: 'POST',
+            body: {
+                ...data,
+                type: 2
+            }
+        })
+        if (res.code === RequstStatusEnum.success) {
+            Toast.show({
+                icon: 'success',
+                content: `反馈成功`,
+                afterClose: () => {
+                    history.back();
+                }
+            });
+            form.resetFields();
+        } else {
+            Toast.show({
+                icon: 'fail',
+                content: `反馈失败，请重试`,
+            });
+        }
     }
+
     return (
         <div className={styles.feedbackContainer}>
             <NavBar back='返回' onBack={back}>
@@ -27,6 +53,7 @@ export default function Cooperation() {
             <div>
                 <Form
                     name='form'
+                    form={form}
                     onFinish={onFinish}
                     layout='horizontal'
                     footer={
@@ -41,10 +68,10 @@ export default function Cooperation() {
                     >
                         <Input onChange={console.log} placeholder='请输入' />
                     </Form.Item>
-                    <Form.Item name='amount' label='手机号/微信号'>
+                    <Form.Item name='phone' label='手机号/微信号'>
                         <Input onChange={console.log} placeholder='请输入' />
                     </Form.Item>
-                    <Form.Item name='address' label='商务合作'>
+                    <Form.Item name='info' label='商务合作'>
                         <TextArea
                             placeholder='请输入'
                             maxLength={100}

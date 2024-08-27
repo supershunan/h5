@@ -13,7 +13,10 @@ export default function FeedBack() {
         const data = values;
         const res = await request('/newApi/feedback/add', {
             method: 'POST',
-            body: data
+            body: {
+                ...data,
+                type: 1
+            }
         })
         if (res.code === RequstStatusEnum.success) {
             Toast.show({

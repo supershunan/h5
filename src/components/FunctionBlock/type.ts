@@ -3,6 +3,7 @@ import React, { ReactNode } from "react";
 export enum JumpTypeEnum {
   modal = "modal",
   router = "router",
+  copy = "copy",
 }
 
 interface ModalBlockContent {

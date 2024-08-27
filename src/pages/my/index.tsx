@@ -40,8 +40,8 @@ export default function Me() {
     const BLOCK_CONTENT2 = [
         {
             name: '邀请链接',
-            jumpType: JumpTypeEnum.router,
-            path: '',
+            jumpType: JumpTypeEnum.copy,
+            modalContent: userInfo?.id,
             icon: <LinkOutline style={{ fontSize: '31px'}} />
         },
         {
