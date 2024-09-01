@@ -1,7 +1,8 @@
-import React from 'react'
-import { Grid, Popover, PullToRefresh, Image } from 'antd-mobile'
+import React, { useRef } from 'react'
+import { Grid, Popover, PullToRefresh, Image, Tag } from 'antd-mobile'
 import { sleep } from 'antd-mobile/es/utils/sleep'
 import { MoreOutline } from 'antd-mobile-icons';
+import { WorkStatusEnum } from '@/utils/type/global.type'
 
 interface ContentListProps {
     contentList: Array<T>;
@@ -14,6 +15,13 @@ interface ContentListProps {
 }
 export default function ContentList(props: ContentListProps) {
     const { contentList, actions, isPullToRefresh=false, handleItem, handlePop, style } = props;
+    const statusBackgroud = useRef({
+        1: '#87d068',
+        2: '#ff8f1f',
+        3: '#ff3141',
+        4: '#ff3141',
+        5: '#ff3141'
+    })
     return (
         <div style={style}>
             <PullToRefresh
@@ -44,6 +52,13 @@ export default function ContentList(props: ContentListProps) {
                                             </Popover.Menu>
                                         }
                                     </div>
+                                    {
+                                        item.type === 'video' &&
+                                        <div>
+                                            当前状态：
+                                            <span style={{ background: statusBackgroud.current[item.status], color: 'white', padding: 2, borderRadius: 4 }}>{WorkStatusEnum[item.status]}</span>
+                                        </div>
+                                    }
                                 </div>
                             </Grid.Item>
                         )

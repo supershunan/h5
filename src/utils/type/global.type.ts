@@ -32,3 +32,12 @@ export enum MoneyTypeEnum {
     /** 提现 */
     cash = 'cash',
 }
+
+/** 作品状态 */
+export enum WorkStatusEnum {
+    '1' = '正常',
+    '2' = '审核中',
+    '3' = '打回',
+    '4' = '强制下架',
+    '5' = '自行下架',
+}

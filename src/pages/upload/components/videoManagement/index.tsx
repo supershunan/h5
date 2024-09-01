@@ -28,7 +28,20 @@ export default function VideoManagement() {
         console.log(node, item)
         switch (node.key) {
             case 0:
-                history.push(`/uploadVideo?id=${item.id}&type=edit`);
+                if (item.type === 'folder') {
+                    history.push(`/uploadVideo?id=${item.id}&type=edit`);
+                }
+
+                if (item.type === 'video' && item.status !== 2) {
+                    history.push(`/uploadVideo?id=${item.id}&type=edit`);
+                }
+
+                if (item.type === 'video' && item.status === 2) {
+                    Modal.show({
+                        title: '审核中，禁止编辑',
+                        closeOnMaskClick: true,
+                    })
+                }
                 break;
             case 1:
                 Dialog.show({

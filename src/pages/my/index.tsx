@@ -100,7 +100,7 @@ export default function Me() {
                         <div className="money">
                             <div className="videoMoney">
                                 <div style={{ marginBottom: '20px' }}>视频收益（元）</div>
-                                <div>10000.00</div>
+                                <div>{ userInfo?.totalIncome ?? 0 }</div>
                             </div>
                             <Divider direction='vertical' style={{ height: '3.9em' }} />
                             <div className="advertMoney">
