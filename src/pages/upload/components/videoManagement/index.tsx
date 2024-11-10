@@ -25,7 +25,6 @@ export default function VideoManagement() {
     }, [params]);
 
     const handlePop = (node: Action, item) => {
-        console.log(node, item)
         switch (node.key) {
             case 0:
                 if (item.type === 'folder') {
@@ -85,7 +84,7 @@ export default function VideoManagement() {
     }
 
     const loadAllVideoList = async () => {
-        const res = await request('/newApi/works/page', {
+        const res = await request('/newApi/works/pageForH5', {
             method: 'POST',
             body: params,
         });

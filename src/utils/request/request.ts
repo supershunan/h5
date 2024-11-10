@@ -1,64 +1,68 @@
-import { history } from 'umi'
-import { CustomRequestInit } from './request.type';
-import { Toast } from 'antd-mobile';
+import { history } from "umi";
+import { CustomRequestInit } from "./request.type";
+import { Toast } from "antd-mobile";
 
-const BASE_URL = 'https://ksys.qfyingshi.cn';
+const isDev = process.env.NODE_ENV === 'development';
+const BASE_URL = isDev ? '/newApi/' : 'https://ksys.qfyingshi.cn/';
 
-export default async function request(path: string, options?: CustomRequestInit): Promise<T> {
-    const Token = localStorage.getItem('Token') || '';
+export default async function request(
+    path: string,
+    options?: CustomRequestInit
+): Promise<T> {
+    const Token = localStorage.getItem("Token") || "";
     // 请求拦截
     if (!options?.skipAuth) {
         if (!Token) {
-            history.push('/login');
-            return Promise.reject(new Error('No token found, redirecting to login.'));
+            history.push("/login");
+            Toast.show({
+                icon: "fail",
+                content: "登录信息过期",
+            });
+            return Promise.reject();
         }
     }
 
     // 重置 headers
     const headers: HeadersInit = {
         ...options?.headers,
-        "Content-Type": 'application/json',
-        "Authorization": Token,
-    }
+        "Content-Type": "application/json",
+        Authorization: Token,
+    };
 
     const updateOptions: RequestInit = {
         ...options,
         headers,
         body: options?.body ? JSON.stringify(options.body) : undefined,
-    }
+    };
 
     const fetchPromise = await fetch(BASE_URL + path, updateOptions);
 
     // 超时时间
     const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Request timed out')), options?.timeout || 5000)
+        setTimeout(
+            () => reject(new Error("Request timed out")),
+            options?.timeout || 5000
+        )
     );
 
     try {
         const response = await Promise.race([fetchPromise, timeoutPromise]);
 
-        if (!(response instanceof Response)) {
-            throw new Error('Failed to fetch data.');
-        }
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                history.push('/login');
-                return Promise.reject(new Error('Unauthorized, redirecting to login.'));
-            }
-
-            const errorText = await response.text();
-            Toast.show({
-                icon: 'error',
-                content: errorText
-            })
-            return Promise.reject(new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`));
-        }
-
         const data = (await response.json()) as T;
+
+        if (data.code === 10003) {
+            // 根据后端返回的code来判断
+            history.push("/login");
+            Toast.show({
+                icon: "fail",
+                content: "登录信息过期",
+            });
+            return Promise.reject()
+        }
+
         return data;
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error("Fetch error:", error);
         return Promise.reject(error);
     }
 }

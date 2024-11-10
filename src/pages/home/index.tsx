@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { Card } from 'antd-mobile';
 import { BankcardOutline, UserSetOutline, DownlandOutline, FileOutline } from 'antd-mobile-icons'
 import styles from './index.less';
@@ -14,6 +14,8 @@ export default function Home() {
 	const [advertisementTextlls, setAdvertisementTextlls] = useState({ content: '广告栏内容' });
 	const [videoSources, setVideoSources] = useState([]);
 	const [platformCustomer, setPlatformCustomer] = useState({ val: 'res'});
+	const [thumbnails, setThumbnails] = useState({});
+    const videoRefs = useRef([]);
 	const BLOCK_CONTENT = [
 		{
 			name: '历史公告',
@@ -93,7 +95,13 @@ export default function Home() {
 				<Card title="使用教程" style={{ marginTop: '10px' }}>
 					<div className="videos">
 						{videoSources.map((item, index) => (
-							<video key={index} src={item?.val} width="100%" height="200" controls />
+							<video
+								key={index}
+								src={item?.val}
+								width="100%"
+								height="200"
+								controls
+							/>
 						))}
 					</div>
 				</Card>

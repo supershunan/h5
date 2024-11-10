@@ -29,7 +29,10 @@ export default function Setting() {
 
     const resetUserInfo = async () => {
         const formValue = form.getFieldsValue();
-        console.log(formValue)
+        if (!formValue.password || !formValue.passwordCertain) {
+            Toast.show('不允许为空');
+            return;
+        }
         if ((formValue.password || formValue.passwordCertain) && (formValue.password !== formValue.passwordCertain)) {
             Toast.show('密码不一致，请检查');
             return;

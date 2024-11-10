@@ -15,7 +15,7 @@ export default function Login() {
     const { search } = useLocation();
     const urlParams = new URLSearchParams(search);
     const id = urlParams.get("id");
-    const [currentStatus, setCurrentStatus] = useState(StatusEnum.phoneLogin);
+    const [currentStatus, setCurrentStatus] = useState(StatusEnum.pwLogin);
     const statusText = useRef([
         {
             key: StatusEnum.register,
@@ -98,11 +98,15 @@ export default function Login() {
     }
 
     const sendCode = async () => {
+        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();4
+        if (!values.account) {
+            Toast.show('请输入手机号');
+            return;
+        }
         if (countTime < COUNT_TIME) {
             Toast.show('禁止频繁获取验证码')
             return;
         }
-        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();
         await sendSms(values?.account as number);
         setShowTime(true);
         const baseTime = countTime;
@@ -185,13 +189,13 @@ export default function Login() {
         if (currentStatus === StatusEnum.register) {
             return (
                 <div className='btn'>
-                    <Button onClick={handleLoginOrRegidter} style={{ padding: '7px 85px' }} color='primary'>注册</Button>
+                    <Button onClick={handleLoginOrRegidter} style={{ padding: '11px 117px' }} color='primary' shape='rounded'>注册</Button>
                 </div>
             );
         }
         return (
             <div className='btn'>
-                <Button onClick={handleLoginOrRegidter} style={{ padding: '7px 85px' }} color='primary'>登录</Button>
+                <Button onClick={handleLoginOrRegidter} style={{ padding: '11px 117px' }} color='primary' shape='rounded'>登录</Button>
             </div>
         );
     }, [currentStatus])
@@ -260,14 +264,14 @@ export default function Login() {
                         </Form.Item>
                     }
                 </Form>
+                {currentBtn}
             </div>
-            {currentBtn}
             <div className='login-bottom-ways'>
                 {
                     statusText.current.map(item => {
                         return (
                             <div key={item.key}>
-                                {item.key > 0 && <Divider direction='vertical' />}
+                                {item.key > 0 && <Divider direction='vertical' style={{ borderColor: 'black'}} />}
                                 <span onClick={() => handleGo(item.key)}>{item.name}</span>
                             </div>
                         )

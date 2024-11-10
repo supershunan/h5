@@ -58,6 +58,10 @@ export default defineConfig({
       component: '@/pages/promation/$id.tsx',
     },
     {
+      path: '/applyForPromotion/:id',
+      component: '@/pages/promation/components/$id.tsx',
+    },
+    {
       path: '/my',
       component: '@/pages/my/index',
     },
@@ -111,6 +115,7 @@ export default defineConfig({
     '/newApi': {
       'target': 'https://ksys.qfyingshi.cn/',
       'changeOrigin': true,
+      'pathRewrite': { '^/newApi': '' },
     },
   },
   npmClient: 'pnpm',

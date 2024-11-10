@@ -62,10 +62,10 @@ export default function FeedBack() {
                         name='name'
                         label='称呼'
                     >
-                        <Input onChange={console.log} placeholder='请输入' />
+                        <Input placeholder='请输入' />
                     </Form.Item>
                     <Form.Item name='phone' label='手机号/微信号'>
-                        <Input onChange={console.log} placeholder='请输入' />
+                        <Input placeholder='请输入' />
                     </Form.Item>
                     <Form.Item name='info' label='反馈信息'>
                         <TextArea

@@ -18,9 +18,9 @@ export default function CollectionManagement() {
     const [data, setData] = useState<any[]>([]);
     const [fileList, setFileList] = useState<ImageUploadItem[]>([
         {
-          url: 'https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641',
+            url: 'https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641',
         },
-      ])
+    ])
     const [itemData, setItemData] = useState<CollectionItem | undefined>();
     const actions: Action[] = [
         { key: ItemOperateEnum.setting, text: "设置" },
@@ -42,7 +42,7 @@ export default function CollectionManagement() {
     }, [params]);
 
     const getCollectionList = async () => {
-        const res = await request("/newApi/works/page", {
+        const res = await request("/newApi/works/pageForH5", {
             method: "POST",
             body: params
         });
@@ -75,7 +75,7 @@ export default function CollectionManagement() {
         if (res.code === RequstStatusEnum.success) {
             res.data.coverImg = [
                 {
-                  url: res.data.coverImg,
+                    url: res.data.coverImg,
                 },
             ]
             setItemData(res.data);
@@ -84,7 +84,6 @@ export default function CollectionManagement() {
     };
 
     const addCollection = async (params: AddFolderParams): Promise<boolean> => {
-        console.log(params)
         const data = {
             title: params.title,
             coverImg: params.coverImg.length > 0 ? params.coverImg[0]?.url : '',
@@ -127,7 +126,7 @@ export default function CollectionManagement() {
 
         const status = res.code === RequstStatusEnum.success;
         Toast.show({
-            content: status ? "更新成功" : "更新失败",
+            content: status ? "更新成功" : res?.msg??"更新失败",
         });
         setVisible(!status);
         reload();
@@ -251,7 +250,7 @@ export default function CollectionManagement() {
         form.resetFields();
     }
 
-    const reload =() => {
+    const reload = () => {
         resetForm();
         setIsLoad(true);
         setParmas({
@@ -263,8 +262,8 @@ export default function CollectionManagement() {
 
     const beforeUpload = (file: File, files: File[]) => {
         if (file.size > 1024 * 1024) {
-          Toast.show('请选择小于 1M 的图片')
-          return null
+            Toast.show('请选择小于 1M 的图片')
+            return null
         }
         return file
     }
@@ -352,12 +351,17 @@ export default function CollectionManagement() {
                             <Form.Header>
                                 <div style={{ textAlign: "center" }}>创建合集</div>
                             </Form.Header>
-                            <Form.Item name="title" label="合集名">
+                            <Form.Item name="title" label="合集名" rules={[
+                                { required: true },
+                            ]}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
                             <Form.Item
                                 name='coverImg'
                                 label='合集封面'
+                                rules={[
+                                    { required: true },
+                                ]}
                             >
                                 <ImageUploader
                                     value={fileList}
@@ -370,8 +374,10 @@ export default function CollectionManagement() {
                             <Form.Item name="promotionUrl" label="推广">
                                 <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item name="enablePromotion" label="是否推广">
-                                <Radio.Group>
+                            <Form.Item name="enablePromotion" label="是否推广" rules={[
+                                { required: true },
+                            ]} initialValue={0}>
+                                <Radio.Group >
                                     <Space>
                                         <Radio value={1}>是</Radio>
                                         <Radio value={0}>否</Radio>

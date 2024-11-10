@@ -68,7 +68,7 @@ export default function TeamBenefits() {
                                 <div className="orderItem" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                     <div style={{ display: 'flex', alignItems: 'center' }}>
                                         {/* <Avatar src={demoAvatarImages[0]} /> */}
-                                        <span style={{ marginLeft: '5px'}}>{item.createBy}</span>
+                                        <span style={{ marginLeft: '5px'}}>{item.nickname}</span>
                                     </div>
                                     <span>
                                         已得分成：
