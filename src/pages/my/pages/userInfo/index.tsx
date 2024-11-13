@@ -90,7 +90,7 @@ export default function Setting() {
                                 upload={uploadImg}
                                 beforeUpload={beforeUpload}
                                 maxCount={1}
-                                style={{ borderRadius: '50px' }}
+                                style={{ borderRadius: '50px', width: '50px' }}
                             />
                         </div>
                     }

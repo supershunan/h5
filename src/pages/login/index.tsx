@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'umi';
 import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { StatusEnum, PhoneLogin, Registor, PwLogin, LoginTypeEnum } from './index.type';
-import LoginBg from './../../assets/images/welcome.jpg';
+import LoginBg from './../../assets/images/bsy.jpg';
 import './index.less';
 import '@/pages/global.less';
 import request from '@/utils/request/request';
@@ -189,13 +189,13 @@ export default function Login() {
         if (currentStatus === StatusEnum.register) {
             return (
                 <div className='btn'>
-                    <Button onClick={handleLoginOrRegidter} style={{ padding: '11px 117px' }} color='primary' shape='rounded'>注册</Button>
+                    <Button onClick={handleLoginOrRegidter} style={{ padding: '11px 117px', background: '#F99025', borderColor: '#F99025' }} color='primary' shape='rounded'>立即注册</Button>
                 </div>
             );
         }
         return (
             <div className='btn'>
-                <Button onClick={handleLoginOrRegidter} style={{ padding: '11px 117px' }} color='primary' shape='rounded'>登录</Button>
+                <Button onClick={handleLoginOrRegidter} style={{ padding: '11px 117px', background: '#F99025', borderColor: '#F99025' }} color='primary' shape='rounded'>立即登录</Button>
             </div>
         );
     }, [currentStatus])
@@ -209,7 +209,7 @@ export default function Login() {
                     height={'168px'}
                     fit='cover'
                 />
-                <Form form={form} layout='horizontal'>
+                <Form form={form} layout='horizontal' style={{ padding: '0 20px' }}>
                     <Form.Item
                         label='手机号'
                         name='account'
@@ -264,8 +264,8 @@ export default function Login() {
                         </Form.Item>
                     }
                 </Form>
-                {currentBtn}
             </div>
+            {currentBtn}
             <div className='login-bottom-ways'>
                 {
                     statusText.current.map(item => {
