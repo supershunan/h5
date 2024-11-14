@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'umi';
 import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { StatusEnum, PhoneLogin, Registor, PwLogin, LoginTypeEnum } from './index.type';
-import LoginBg from './../../assets/images/bsy.jpg';
+import LoginBg from './../../assets/images/DL.jpg';
 import './index.less';
 import '@/pages/global.less';
 import request from '@/utils/request/request';
@@ -206,7 +206,7 @@ export default function Login() {
                 <Image
                     src={LoginBg}
                     width={'100%'}
-                    height={'168px'}
+                    height={'188px'}
                     fit='cover'
                 />
                 <Form form={form} layout='horizontal' style={{ padding: '0 20px' }}>
