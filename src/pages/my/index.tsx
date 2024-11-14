@@ -84,7 +84,7 @@ export default function Me() {
                 <Card>
                     <div className="userInfo">
                         <div style={{ display: 'flex', alignItems: 'center'}}>
-                            <Avatar src={userInfo?.avatar} style={{ '--size': '64px', borderRadius: '50px' }} />
+                            <Avatar src={userInfo?.avatar} style={{ '--size': '64px' }} />
                             <div className="info">
                                 <div className='nick'>{ userInfo?.nickname ?? '默认昵称' }</div>
                                 <div>账号：{ userInfo?.account }</div>

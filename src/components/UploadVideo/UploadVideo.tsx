@@ -57,10 +57,13 @@ export default function UploadVideo() {
             status = await addVideo(values);
         }
         Toast.show({
-            content: status ? "上传/更新成功" : "上传/更新失败",
+            content: status.status ? "上传/更新成功" : status.data,
         });
-        status && form.resetFields();
+        
+        if (status.status) {
+            form.resetFields();
         history.back();
+        }
     };
 
     const videoClass = async () => {
@@ -103,7 +106,7 @@ export default function UploadVideo() {
         }
     };
 
-    const addVideo = async (values: any): Promise<boolean> => {
+    const addVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
         const data = {
             title: values.title, //标题
             info: values.info, //简介
@@ -119,10 +122,13 @@ export default function UploadVideo() {
             method: "POST",
             body: data,
         });
-        return res.code === RequstStatusEnum.success;
+        return {
+            status: res.code === RequstStatusEnum.success,
+            data: res.msg
+        };
     };
 
-    const updateVideo = async (values: any): Promise<boolean> => {
+    const updateVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
         const data = {
             id: videoDetail?.id,
             title: values.title,
@@ -138,7 +144,10 @@ export default function UploadVideo() {
             method: "POST",
             body: data,
         });
-        return res.code === RequstStatusEnum.success;
+        return {
+            status: res.code === RequstStatusEnum.success,
+            data: res.msg
+        };
     };
 
     function beforeUpload(file: File) {
@@ -167,7 +176,7 @@ export default function UploadVideo() {
             Toast.show({
                 content: `视频大小不能超过200Mb`,
             });
-            return Promise.reject();
+            return Promise.reject('视频大小不能超过200Mb');
         }
         const formdata = new FormData();
         formdata.append("file", file);
@@ -204,7 +213,7 @@ export default function UploadVideo() {
                         e.target.value = "";
                     })
                     .catch((error: Error) => {
-                        Toast.show("上传失败，请重试");
+                        Toast.show(error);
                         console.error("Upload failed:", error);
                     });
             }
