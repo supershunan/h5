@@ -98,7 +98,7 @@ export default function Login() {
     }
 
     const sendCode = async () => {
-        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();4
+        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue(); 4
         if (!values.account) {
             Toast.show('请输入手机号');
             return;
@@ -203,12 +203,7 @@ export default function Login() {
     return (
         <div className='login'>
             <div className="login-content">
-                <Image
-                    src={LoginBg}
-                    width={'100%'}
-                    height={'188px'}
-                    fit='cover'
-                />
+                <img src={LoginBg} width={'100%'} />
                 <Form form={form} layout='horizontal' style={{ padding: '0 20px' }}>
                     <Form.Item
                         label='手机号'
@@ -265,13 +260,15 @@ export default function Login() {
                     }
                 </Form>
             </div>
-            {currentBtn}
+            <div>
+                {currentBtn}
+            </div>
             <div className='login-bottom-ways'>
                 {
                     statusText.current.map(item => {
                         return (
                             <div key={item.key}>
-                                {item.key > 0 && <Divider direction='vertical' style={{ borderColor: 'black'}} />}
+                                {item.key > 0 && <Divider direction='vertical' style={{ borderColor: 'black' }} />}
                                 <span onClick={() => handleGo(item.key)}>{item.name}</span>
                             </div>
                         )
