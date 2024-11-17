@@ -33,6 +33,8 @@ export default function UploadVideo() {
     const [videoValue, setVideoValue] = useState<(string | null)[]>(["6"]);
     const [colllectionValue, setColllectionValue] = useState<(string | null)[]>([]);
     const [videoDetail, setVideoDetail] = useState();
+    const [imgFile, setImgFile] = useState<File>();
+    const [videoFile, setVideoFile] = useState<File>();
 
     useEffect(() => {
         videoClass();
@@ -62,7 +64,7 @@ export default function UploadVideo() {
         
         if (status.status) {
             form.resetFields();
-        history.back();
+            history.back();
         }
     };
 
@@ -107,11 +109,13 @@ export default function UploadVideo() {
     };
 
     const addVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
+        const coverImg = await startUploadImg()
+        const playUrl = await startUploadVideo()
         const data = {
             title: values.title, //标题
             info: values.info, //简介
-            coverImg: values.coverImg?.length > 0 ? values.coverImg[0]?.url : "", //封面
-            playUrl: values.playUrl, //上传视频的地址
+            coverImg: coverImg ? coverImg : values.coverImg?.length > 0 ? values.coverImg[0]?.url : "", //封面
+            playUrl: playUrl ? playUrl : values.playUrl, //上传视频的地址
             collNum: values.collNum, //集数
             pid: id ? id : values.collection[0], //合集的id
             useTime: values.useTime, //购买一次使用的时间，单位 小时
@@ -129,12 +133,14 @@ export default function UploadVideo() {
     };
 
     const updateVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
+        const coverImg = await startUploadImg()
+        const playUrl = await startUploadVideo()
         const data = {
             id: videoDetail?.id,
             title: values.title,
             info: values.info,
-            coverImg: values.coverImg.length > 0 ? values.coverImg[0]?.url : "",
-            playUrl: values.playUrl,
+            coverImg: coverImg ? coverImg : values.coverImg?.length > 0 ? values.coverImg[0]?.url : "", //封面
+            playUrl: playUrl ? playUrl : values.playUrl, //上传视频的地址values.playUrl,
             collNum: values.collNum,
             pid: values.collection[0],
             useTime: values.useTime,
@@ -154,9 +160,10 @@ export default function UploadVideo() {
         return file;
     }
 
-    const uploadImg = async (file: File): Promise<ImageUploadItem> => {
+    const startUploadImg = async () => {
+        if (!imgFile) return null;
         const formdata = new FormData();
-        formdata.append("file", file);
+        formdata.append("file", imgFile);
 
         const res = await fetch("/apiFile/file/upload", {
             method: "POST",
@@ -166,8 +173,29 @@ export default function UploadVideo() {
             body: formdata,
         });
         const data = await res.json();
+        return data.data
+    }
+
+    const startUploadVideo = async () => {
+        if (!videoFile) return null
+        const formdata = new FormData();
+        formdata.append("file", videoFile);
+
+        const res = await fetch("/apiFile/file/upload", {
+            method: "POST",
+            headers: {
+                Authorization: localStorage.getItem("Token") as string,
+            },
+            body: formdata,
+        });
+        const data = await res.json();
+        return data.data
+    }
+
+    const uploadImg = async (file: File): Promise<ImageUploadItem> => {
+        setImgFile(file)
         return {
-            url: data.data,
+            url: URL.createObjectURL(file),
         };
     };
 
@@ -178,19 +206,9 @@ export default function UploadVideo() {
             });
             return Promise.reject('视频大小不能超过200Mb');
         }
-        const formdata = new FormData();
-        formdata.append("file", file);
-
-        const res = await fetch("/apiFile/file/upload", {
-            method: "POST",
-            headers: {
-                Authorization: localStorage.getItem("Token") as string,
-            },
-            body: formdata,
-        });
-        const data = await res.json();
+        setVideoFile(file)
         return {
-            url: data.data,
+            url: URL.createObjectURL(file),
         };
     };
 
