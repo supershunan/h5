@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { history, useLocation } from 'umi';
-import { Modal, Card } from 'antd-mobile';
+import { Modal, Card, Button, Toast } from 'antd-mobile';
 import { BankcardOutline, UserSetOutline, DownlandOutline, FileOutline } from 'antd-mobile-icons';
 import styles from './index.less';
 import { FunctionBlockProps, JumpTypeEnum, BlockContent } from './type';
@@ -18,9 +18,45 @@ export default function FunctionBlock(props: FunctionBlockProps) {
         } else if (type === JumpTypeEnum['copy']) {
             Modal.show({
                title: '请复制到浏览器打开',
-               content: window.location.origin + `/login?id=${content}`,
+               content: 
+               <div>
+                    <span>{window.location.origin}/login?id={content}</span>
+                    <Button onClick={() => handleCopy(`${window.location.origin}/login?id=${content}`)} block color='primary' size='middle'>
+                        拷贝
+                    </Button>
+               </div>,
                 closeOnMaskClick: true,
             })
+        }
+    }
+    const handleCopy = (text: string) => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text)
+                .then(() => {
+                    Toast.show({
+                        icon: "success",
+                        content: "已复制剪切板",
+                    });
+                })
+                .catch(err => {
+                    console.error('Failed to copy text to clipboard:', err);
+                });
+        } else {
+            // 提供兼容方案，使用 `document.execCommand` 复制
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                Toast.show({
+                    icon: "success",
+                    content: "已复制剪切板",
+                });
+            } catch (err) {
+                console.error('Failed to copy text to clipboard:', err);
+            }
+            document.body.removeChild(textArea);
         }
     }
 

@@ -3,6 +3,7 @@ import request from '@/utils/request/request'
 import { RequstStatusEnum } from '@/utils/request/request.type'
 import { CustomizeInfoEnum } from '@/utils/type/global.type'
 import React, { useEffect, useState } from 'react'
+import './index.less'
 
 export default function PrivacyPolicy() {
     const [privacyPolicy, setPrivacyPolicy] = useState();
@@ -18,7 +19,10 @@ export default function PrivacyPolicy() {
     return (
         <div style={{ padding: '46px 0' }}>
             <NavBarBack content={'隐私政策'} style={{ maxWidth: '450px', background: '#fff', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-            <div dangerouslySetInnerHTML={{ __html: privacyPolicy?.val }} />
+            <div
+                dangerouslySetInnerHTML={{ __html: privacyPolicy?.val }}
+                className='toolbox-content'
+            />
         </div>
     )
 }
