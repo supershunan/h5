@@ -149,12 +149,13 @@ export default function withdrawal() {
                     setRulesVisibility(false)
                 }}
                 bodyStyle={{
-                    borderTopLeftRadius: '8px',
-                    borderTopRightRadius: '8px',
-                    minHeight: '40vh',
+                    borderTopLeftRadius: "8px",
+                    borderTopRightRadius: "8px",
+                    minHeight: "40vh",
+                    maxWidth: '450px'
                 }}
                 >
-                {withdrawRules?.val}
+                <div dangerouslySetInnerHTML={{ __html: withdrawRules?.val ?? '' }} />
             </Popup>
         </div>
     )

@@ -13,6 +13,7 @@ body {
     height: 100%;
     margin: 0 auto;
     position: relative; /* 关键 */
+    /* overflow: scroll; */
 }
 
 @media (min-width: 450px) {
