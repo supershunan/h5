@@ -3,6 +3,7 @@ import { useParams, useLocation, history } from 'umi'
 import React, { useEffect, useState } from 'react'
 import { Button, Card, Tag, Image, Modal, Toast } from 'antd-mobile';
 import styles from './index.css'
+import './index.less'
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
 
@@ -62,9 +63,9 @@ export default function TaskDetail() {
     }
 
     return (
-        <div style={{ padding: '46px 0' }}>
+        <div style={{ padding: '46px 0' }} className='applyForPromotion'>
             <NavBarBack content={name as string} style={{ maxWidth: '450px', background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-            <div style={{ padding: '6px 6px' }}>
+            <div style={{ padding: '6px 6px' }} className='promationDetail'>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Image src={promationDetails?.coverImg} width={200} height={200} fit='contain' />
                 </div>
@@ -81,10 +82,12 @@ export default function TaskDetail() {
                         <div dangerouslySetInnerHTML={{ __html: promationDetails?.promotionDetail }} />
                     </div>
                 </Card>
+                <div className='floatBtn'>
+                    <Button onClick={goPromotion} block type='submit' color='primary' size='large'>
+                        申请推广
+                    </Button>
+                </div>
             </div>
-            <Button onClick={goPromotion} block type='submit' color='primary' size='large' style={{ width: '80%', position: 'fixed', bottom: '70px', left: '50%', transform: 'translate(-50%, 0)' }}>
-                申请推广
-            </Button>
         </div>
     )
 }

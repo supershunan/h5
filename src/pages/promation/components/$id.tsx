@@ -4,6 +4,7 @@ import { Button, Card, Form, Input, TextArea, Toast } from 'antd-mobile'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
 import { useParams } from 'umi';
+import './index.less'
 
 export default function ApplyForPromotion() {
     const { id } = useParams<{ id: string, name: string }>();
@@ -52,9 +53,9 @@ export default function ApplyForPromotion() {
         })
     }
     return (
-        <div style={{ padding: '46px 0' }}>
+        <div style={{ padding: '46px 0' }} className='applyForPromotion-id'>
             <NavBarBack content={'申请推广'} style={{ maxWidth: '450px', background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
-            <div style={{ padding: '6px 6px' }}>
+            <div style={{ padding: '6px 6px' }} className='promationDetail-id'>
                 <Card>
                     <Form
                         name='form'
@@ -85,10 +86,13 @@ export default function ApplyForPromotion() {
                         </Form.Item>
                     </Form>
                 </Card>
+                <div className='floatBtn-id'>
+                    <Button onClick={onFinish} block type='submit' color='primary' size='large'>
+                        确认
+                    </Button>
+                </div>
             </div>
-            <Button onClick={onFinish} block type='submit' color='primary' size='large' style={{ width: '80%', position: 'fixed', bottom: '70px', left: '50%', transform: 'translate(-50%, 0)' }}>
-                确认
-            </Button>
+            
         </div>
     )
 }

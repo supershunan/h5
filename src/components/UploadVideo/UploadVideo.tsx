@@ -337,6 +337,7 @@ export default function UploadVideo() {
                                 次元币
                             </div>
                         }
+                        initialValue={0}
                     >
                         <Input placeholder="请输入" type="number" />
                     </Form.Item>
@@ -416,7 +417,7 @@ export default function UploadVideo() {
                 {/* <Form.Item name="useTime" label="使用时间" rules={[{ required: true }]}>
                     <Input placeholder="请输入" />
                 </Form.Item> */}
-                <Form.Item name="info" label="简介" rules={[{ required: true }]}>
+                <Form.Item name="info" label="简介">
                     <TextArea placeholder="请输入" maxLength={30} rows={2} showCount />
                 </Form.Item>
             </Form>
