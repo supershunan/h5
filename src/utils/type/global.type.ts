@@ -41,3 +41,17 @@ export enum WorkStatusEnum {
     '4' = '强制下架',
     '5' = '自行下架',
 }
+
+/** 审核状态 */
+export enum AuditStatusEnum {
+    /** 正常 */
+    normal = 1,
+    /** 审核中 */
+    audit = 2,
+    /** 打回 */
+    reject = 3,
+    /** 强制下架 */
+    force = 4,
+    /** 自行下架 */
+    self = 5,
+}

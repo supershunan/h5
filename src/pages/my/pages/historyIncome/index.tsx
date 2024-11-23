@@ -9,20 +9,6 @@ export default function HistoryIncome() {
     const [historyItems, setHistoryItems] = useState<{ id: number, money: string, updateTime: string }[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [params, setParmas] = useState<{ page: number, rows: number }>({ page: 1, rows: 5 });
-    const [data, setData] = useState([
-        {
-            id: 1,
-            time: '2024-01-01',
-            videoMoney: '100',
-            advertMoney: '100',
-        },
-        {
-            id: 2,
-            time: '2024-01-01',
-            videoMoney: '100',
-            advertMoney: '100',
-        }
-    ])
 
     const loadHistoryItems = async () => {
         const res = await request(`/newApi/moneyLog/pageMy/${BenefitsEnum.persionBenfits}`, {

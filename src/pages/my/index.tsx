@@ -3,7 +3,7 @@ import { Avatar, Button, Card, Divider, Image, Space } from 'antd-mobile'
 import BgImg from '@/assets/images/welcome.jpg'
 import FunctionBlock from '@/components/FunctionBlock/FunctionBlock';
 import { JumpTypeEnum } from '@/components/FunctionBlock/type';
-import { AppstoreOutline, GlobalOutline, SetOutline, PayCircleOutline, LinkOutline, ReceiptOutline, RightOutline } from 'antd-mobile-icons';
+import { AppstoreOutline, GlobalOutline, SetOutline, PayCircleOutline, LinkOutline, ReceiptOutline, RightOutline, ContentOutline } from 'antd-mobile-icons';
 import './index.less'
 import { history } from 'umi';
 import request from '@/utils/request/request';
@@ -13,7 +13,7 @@ export default function Me() {
     const [userInfo, setUserInfo] = useState();
     const BLOCK_CONTENT = [
         {
-            name: '工具箱',
+            name: '工具箱⠀',
             jumpType: JumpTypeEnum.router,
             path: '/toolbox',
             icon: <AppstoreOutline style={{ fontSize: '31px' }} />
@@ -31,7 +31,13 @@ export default function Me() {
             icon: <PayCircleOutline style={{ fontSize: '31px' }} />
         },
         {
-            name: '设置',
+            name: '我的词库',
+            jumpType: JumpTypeEnum.router,
+            path: '/myWords',
+            icon: <ContentOutline style={{ fontSize: '31px' }} />
+        },
+        {
+            name: '⠀设置⠀⠀',
             jumpType: JumpTypeEnum.router,
             path: '/setting',
             icon: <SetOutline style={{ fontSize: '31px' }} />

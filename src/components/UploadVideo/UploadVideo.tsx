@@ -11,6 +11,7 @@ import { Form, Input, Button, TextArea } from "antd-mobile";
 import "./index.less";
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
+import { AuditStatusEnum } from "@/utils/type/global.type";
 
 enum UploadType {
     edit = "edit",
@@ -327,6 +328,7 @@ export default function UploadVideo() {
                 <Form.Item
                     name="playUrl"
                     rules={[{ required: true }]}
+                    disabled={type === UploadType.edit && (videoDetail?.status === AuditStatusEnum.normal || videoDetail?.status === AuditStatusEnum.audit)}
                     label={
                         <div className="uploadTip">
                             <span className="uploadHeadtitle">上传视频</span>
@@ -436,7 +438,7 @@ export default function UploadVideo() {
                     <Input placeholder="请输入" />
                 </Form.Item> */}
                 <Form.Item name="info" label="简介">
-                    <TextArea placeholder="请输入" maxLength={30} rows={2} showCount />
+                    <TextArea placeholder="请输入" rows={2} showCount />
                 </Form.Item>
             </Form>
         </div>

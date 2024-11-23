@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem } from "antd-mobile";
+import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem, TextArea } from "antd-mobile";
 import { history } from "umi";
 import { Action } from "antd-mobile/es/components/popover";
 import NavBarBack from "@/components/NavBarBack/NavBarBack";
@@ -34,6 +34,7 @@ export default function CollectionManagement() {
     const [hasMore, setHasMore] = useState(true);
     const [params, setParmas] = useState<{ page: number, rows: number, type: string }>({ page: 1, rows: 5, type: 'folder' });
     const [isLoad, setIsLoad] = useState(false);
+    const [imgFile, setImgFile] = useState<File>();
 
     useEffect(() => {
         if (isLoad) {
@@ -109,11 +110,12 @@ export default function CollectionManagement() {
     };
 
     const updateCollection = async (item: CollectionItem) => {
+        const coverImg = await startUpload();
+        console.log(coverImg, item);
         const data = {
             id: itemData?.id,
             title: item.title,
-            coverImg:
-                "https://inews.gtimg.com/om_bt/OGlQWfsaAoKkuCcMZ2o9IVEPqd-72DQy5EAN02XBHUwfYAA/641",
+            coverImg: coverImg?.url ?? item.coverImg[0]?.url,
             promotionUrl: item.promotionUrl,
             enablePromotion: item.enablePromotion
                 ? PromotionEnum.start
@@ -233,7 +235,8 @@ export default function CollectionManagement() {
 
     const handleAdd = async () => {
         const formValue = form.getFieldsValue();
-        const addStatus = await addCollection(formValue);
+        const coverImg = await startUpload();
+        const addStatus = await addCollection({ ...formValue, coverImg: coverImg?.url ?? '' });
         setVisible(!addStatus);
         Toast.show({
             content: addStatus ? "创建成功" : "创建失败",
@@ -269,8 +272,16 @@ export default function CollectionManagement() {
     }
 
     const upload = async (file: File): Promise<ImageUploadItem> => {
+        setImgFile(file)
+        return {
+            url: URL.createObjectURL(file),
+        };
+    }
+
+    const startUpload = async () => {
+        if (!imgFile) return;
         const formdata = new FormData();
-        formdata.append("file", file);
+        formdata.append("file", imgFile);
 
         const res = await fetch("/apiFile/file/upload", {
             method: 'POST',
@@ -383,6 +394,9 @@ export default function CollectionManagement() {
                                         <Radio value={0}>否</Radio>
                                     </Space>
                                 </Radio.Group>
+                            </Form.Item>
+                            <Form.Item name="info" label="合集简介">
+                                <TextArea placeholder="请输入" rows={2} showCount />
                             </Form.Item>
                         </Form>
                     </div>

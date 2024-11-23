@@ -78,6 +78,10 @@ export default defineConfig({
       component: '@/pages/my/pages/cooperation/index.tsx',
     },
     {
+      path: '/myWords',
+      component: '@/pages/my/pages/myWords/index.tsx',
+    },
+    {
       path: '/userAgreement',
       component: '@/pages/my/pages/userAgreement/index.tsx',
     },

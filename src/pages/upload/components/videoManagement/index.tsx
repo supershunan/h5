@@ -7,6 +7,7 @@ import ContentList from '@/components/ContentList/ContentList'
 import './index.less'
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
+import { AuditStatusEnum } from '@/utils/type/global.type';
 
 export default function VideoManagement() {
     const [data, setData] = useState<any[]>([])
@@ -30,16 +31,13 @@ export default function VideoManagement() {
                 if (item.type === 'folder') {
                     history.push(`/uploadVideo?id=${item.id}&type=edit`);
                 }
-
-                if (item.type === 'video' && item.status !== 2) {
-                    history.push(`/uploadVideo?id=${item.id}&type=edit`);
-                }
-
-                if (item.type === 'video' && item.status === 2) {
+                if (item.type === 'video' && (item.status === AuditStatusEnum.force || item.status === AuditStatusEnum.self)) {
                     Modal.show({
-                        title: '审核中，禁止编辑',
+                        title: '下架时评，仅支持删除',
                         closeOnMaskClick: true,
                     })
+                } else {
+                    history.push(`/uploadVideo?id=${item.id}&type=edit`);
                 }
                 break;
             case 1:
