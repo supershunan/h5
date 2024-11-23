@@ -34,7 +34,7 @@ export default function MyWords() {
         Modal.show({
             content: (<div>
                 <span>关键词：{data.keywords}</span>
-                <span style={{ color: '#07bf07', cursor: 'pointer', marginLeft: '10px' }} onClick={() => handleCopy(data.keywords)}>拷贝</span>
+                <span style={{ color: '#07bf07', cursor: 'pointer', marginLeft: '10px' }} onClick={() => handleCopy(data.keywords)}>复制</span>
             </div>),
             closeOnMaskClick: true,
         })

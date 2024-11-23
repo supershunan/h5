@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { history, useLocation, useParams } from "umi";
 import {
     ImageUploader,
@@ -6,6 +6,8 @@ import {
     Toast,
     Picker,
     List,
+    SpinLoading,
+    Mask,
 } from "antd-mobile";
 import { Form, Input, Button, TextArea } from "antd-mobile";
 import "./index.less";
@@ -36,6 +38,8 @@ export default function UploadVideo() {
     const [videoDetail, setVideoDetail] = useState();
     const [imgFile, setImgFile] = useState<File>();
     const [videoFile, setVideoFile] = useState<File>();
+    const [visible, setVisible] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
 
     useEffect(() => {
         videoClass();
@@ -53,6 +57,7 @@ export default function UploadVideo() {
     }, [videoDetail]);
 
     const onFinish = async (values: any) => {
+        setVisible(true)
         let status;
         if (type === UploadType.edit) {
             status = await updateVideo(values);
@@ -110,13 +115,21 @@ export default function UploadVideo() {
     };
 
     const addVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
-        const coverImg = await startUploadImg()
-        const playUrl = await startUploadVideo()
+        let coverImg = values.coverImg[0]?.url
+        let playUrl = values.playUrl
+        if (coverImg.includes('blob')) {
+            coverImg = await startUploadImg()
+            form.setFieldValue('coverImg', [{ url: coverImg }])
+        }
+        if (playUrl.includes('blob')) {
+            playUrl = await startUploadVideo()
+            form.setFieldValue('playUrl', playUrl)
+        }
         const data = {
             title: values.title, //标题
             info: values.info, //简介
-            coverImg: coverImg ? coverImg : values.coverImg?.length > 0 ? values.coverImg[0]?.url : "", //封面
-            playUrl: playUrl ? playUrl : values.playUrl, //上传视频的地址
+            coverImg: coverImg ? coverImg : "", //封面
+            playUrl: playUrl, //上传视频的地址
             collNum: values.collNum, //集数
             pid: id ? id : values.collection[0], //合集的id
             useTime: values.useTime, //购买一次使用的时间，单位 小时
@@ -127,6 +140,7 @@ export default function UploadVideo() {
             method: "POST",
             body: data,
         });
+        setVisible(false)
         return {
             status: res.code === RequstStatusEnum.success,
             data: res.msg
@@ -134,14 +148,22 @@ export default function UploadVideo() {
     };
 
     const updateVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
-        const coverImg = await startUploadImg()
-        const playUrl = await startUploadVideo()
+        let coverImg = values.coverImg[0]?.url
+        let playUrl = values.playUrl
+        if (coverImg.includes('blob')) {
+            coverImg = await startUploadImg()
+            form.setFieldValue('coverImg', [{ url: coverImg }])
+        }
+        if (playUrl.includes('blob')) {
+            playUrl = await startUploadVideo()
+            form.setFieldValue('playUrl', playUrl)
+        }
         const data = {
             id: videoDetail?.id,
             title: values.title,
             info: values.info,
-            coverImg: coverImg ? coverImg : values.coverImg?.length > 0 ? values.coverImg[0]?.url : "", //封面
-            playUrl: playUrl ? playUrl : values.playUrl, //上传视频的地址values.playUrl,
+            coverImg: coverImg ? coverImg : "", //封面
+            playUrl: playUrl, //上传视频的地址values.playUrl,
             collNum: values.collNum,
             pid: values.collection[0],
             useTime: values.useTime,
@@ -151,6 +173,7 @@ export default function UploadVideo() {
             method: "POST",
             body: data,
         });
+        setVisible(false)
         return {
             status: res.code === RequstStatusEnum.success,
             data: res.msg
@@ -182,15 +205,34 @@ export default function UploadVideo() {
         const formdata = new FormData();
         formdata.append("file", videoFile);
 
-        const res = await fetch("/apiFile/file/upload", {
-            method: "POST",
-            headers: {
-                Authorization: localStorage.getItem("Token") as string,
-            },
-            body: formdata,
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/apiFile/file/upload", true);
+        xhr.setRequestHeader("Authorization", localStorage.getItem("Token") as string);
+
+        return new Promise((resolve, reject) => {
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const progress = Math.round((event.loaded / event.total) * 100);
+                    setUploadProgress(progress)
+                    console.log(`上传进度: ${progress}%`);
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+                    resolve(data.data);
+                } else {
+                    reject(new Error('上传失败'));
+                }
+            };
+
+            xhr.onerror = () => {
+                reject(new Error('上传失败'));
+            };
+
+            xhr.send(formdata);
         });
-        const data = await res.json();
-        return data.data
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
@@ -208,6 +250,7 @@ export default function UploadVideo() {
             return Promise.reject('视频大小不能超过200Mb');
         }
         setVideoFile(file)
+        console.log(URL.createObjectURL(file))
         return {
             url: URL.createObjectURL(file),
         };
@@ -441,6 +484,13 @@ export default function UploadVideo() {
                     <TextArea placeholder="请输入" rows={2} showCount />
                 </Form.Item>
             </Form>
+            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display:`${visible ? '' : 'none'}`}}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexFlow: 'column' }}>
+                    <SpinLoading color='primary' />
+                    <span>视频上传中进度：{uploadProgress}%</span>
+                </div>
+            </div>
+            <Mask visible={visible} />
         </div>
     );
 }

@@ -22,7 +22,7 @@ export default function FunctionBlock(props: FunctionBlockProps) {
                <div>
                     <span>{window.location.origin}/login?id={content}</span>
                     <Button onClick={() => handleCopy(`${window.location.origin}/login?id=${content}`)} block color='primary' size='middle'>
-                        拷贝
+                    复制
                     </Button>
                </div>,
                 closeOnMaskClick: true,
