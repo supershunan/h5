@@ -19,6 +19,7 @@ export interface AddFolderParams {
     promotionUrl: string;
     /** 是否开启推广  0否 1是 */
     enablePromotion: 0 | 1;
+    info: string;
 }
 
 export interface CollectionItem {

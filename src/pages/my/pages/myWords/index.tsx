@@ -1,7 +1,7 @@
 import NavBarBack from "@/components/NavBarBack/NavBarBack";
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
-import { InfiniteScroll, List, Image, Toast, Modal } from "antd-mobile";
+import { InfiniteScroll, List, Image, Toast, Modal, Button } from "antd-mobile";
 import React, { useState } from "react";
 import './index.less'
 export default function MyWords() {
@@ -32,9 +32,9 @@ export default function MyWords() {
 
     const wordsItemDetail = (data: { keywords: string, oriName: string }) => {
         Modal.show({
-            content: (<div>
-                <span>关键词：{data.keywords}</span>
-                <span style={{ color: '#07bf07', cursor: 'pointer', marginLeft: '10px' }} onClick={() => handleCopy(data.keywords)}>复制</span>
+            content: (<div style={{ display: 'flex', alignItems: 'center'}}>
+                <span style={{marginRight: '10px'}}>关键词：{data.keywords}</span>
+                <Button onClick={() => handleCopy(data.keywords)} color='primary' size='mini'>复制</Button>
             </div>),
             closeOnMaskClick: true,
         })

@@ -21,7 +21,7 @@ export default function FunctionBlock(props: FunctionBlockProps) {
                content: 
                <div>
                     <span>{window.location.origin}/login?id={content}</span>
-                    <Button onClick={() => handleCopy(`${window.location.origin}/login?id=${content}`)} block color='primary' size='middle'>
+                    <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${window.location.origin}/login?id=${content}`)} block color='primary' size='mini'>
                     复制
                     </Button>
                </div>,

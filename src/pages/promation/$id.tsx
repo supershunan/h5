@@ -66,8 +66,15 @@ export default function TaskDetail() {
         <div style={{ padding: '46px 0' }} className='applyForPromotion'>
             <NavBarBack content={name as string} style={{ maxWidth: '450px', background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div style={{ padding: '6px 6px' }} className='promationDetail'>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <Image src={promationDetails?.coverImg} width={200} height={200} fit='contain' />
+                <div style={{ display: 'flex' }}>
+                    <Image src={promationDetails?.coverImg} width={200} fit='contain' />
+                    <div style={{ display: 'flex', flexFlow: 'column', marginLeft: '10px'}}>
+                        <span style={{fontSize: '14px', fontWeight: '800'}}>{promationDetails?.title}</span>
+                        <div>
+                            <span >简介：</span>
+                            <span>{promationDetails?.info}</span>
+                        </div>
+                    </div>
                 </div>
                 <Card title="任务详情">
                     <div className={styles.shareUrl}>

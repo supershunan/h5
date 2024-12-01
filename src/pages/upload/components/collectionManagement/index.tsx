@@ -87,11 +87,12 @@ export default function CollectionManagement() {
     const addCollection = async (params: AddFolderParams): Promise<boolean> => {
         const data = {
             title: params.title,
-            coverImg: params.coverImg.length > 0 ? params.coverImg[0]?.url : '',
+            coverImg: params.coverImg,
             promotionUrl: params.promotionUrl,
             enablePromotion: params.enablePromotion
                 ? PromotionEnum.start
                 : PromotionEnum.end,
+            info: params?.info,
         };
         const res = await request("/newApi/works/addFolder", {
             method: "POST",
@@ -120,6 +121,7 @@ export default function CollectionManagement() {
             enablePromotion: item.enablePromotion
                 ? PromotionEnum.start
                 : PromotionEnum.end,
+            info: item.info
         };
         const res = await request("/newApi/works/update", {
             method: "POST",
