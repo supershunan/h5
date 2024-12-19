@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'umi';
 import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { StatusEnum, PhoneLogin, Registor, PwLogin, LoginTypeEnum } from './index.type';
-import LoginBg from './../../assets/images/DL.jpg';
+import LoginBg from './../../assets/images/创作者中心.png';
+import LoginBg2 from './../../assets/images/达人中心.png';
 import './index.less';
 import '@/pages/global.less';
 import request from '@/utils/request/request';
