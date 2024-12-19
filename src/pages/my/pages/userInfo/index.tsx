@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { history } from 'umi'
 import NavBarBack from '@/components/NavBarBack/NavBarBack'
-import { Button, Card, Form, ImageUploader, ImageUploadItem, Input, Toast } from 'antd-mobile'
+import { Button, Card, Form, ImageUploader, ImageUploadItem, Input, TextArea, Toast } from 'antd-mobile'
 import './index.less'
 import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
@@ -37,7 +37,8 @@ export default function Setting() {
         const formValue = form.getFieldsValue();
         const data1 = {
             avatar: fileList[0].url,
-            nickname: formValue.nickname
+            nickname: formValue.nickname,
+            info: formValue.info
         }
         const updateUserInfo = await request('/newApi/user/updateMyInfo', {
             method: 'POST',
@@ -105,6 +106,11 @@ export default function Setting() {
                 >
                     <Form.Item name='nickname' label='昵称'>
                         <Input placeholder="请输入" />
+                    </Form.Item>
+                    <Form.Item name='info' label='简介'>
+                        <TextArea
+                            placeholder='请输入'
+                        />
                     </Form.Item>
                 </Form>
                 <Button onClick={onFinish} block type='submit' color='primary' size='large' style={{ marginTop: '10px' }}>

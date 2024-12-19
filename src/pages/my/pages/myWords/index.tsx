@@ -82,7 +82,10 @@ export default function MyWords() {
                                     <Image src={item.coverImg} width={'100%'} height={100} fit='fill' />
                                 </div>
                                 <div className="wordItemTitle">
-                                    <span className="oriName">合集名：{item.oriName}</span>
+                                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                                        <span className="oriName" style={{width: '64px'}}>别名：{item.oriName}</span>
+                                        <Button onClick={() => handleCopy(data.keywords)} color='primary' size='mini'>复制</Button>
+                                    </div>
                                     <span className="status">推广中</span>
                                     <span style={{ fontSize: '12px' }}>申请时间：{item.createTime}</span>
                                     {/* <span className="keywords">关键词：{item.keywords}</span> */}

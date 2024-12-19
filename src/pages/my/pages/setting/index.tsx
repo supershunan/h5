@@ -116,9 +116,9 @@ export default function Setting() {
                 <Button onClick={onFinish} block type='submit' color='primary' size='large' style={{ marginTop: '10px' }}>
                     提交
                 </Button>
-                <Button onClick={onBinding} block size='large' style={{ marginTop: '10px' }}>
+                {/* <Button onClick={onBinding} block size='large' style={{ marginTop: '10px' }}>
                     账号绑定
-                </Button>
+                </Button> */}
                 <Button onClick={onExit} block size='large' style={{ marginTop: '10px' }}>
                     退出登录
                 </Button>
