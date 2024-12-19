@@ -67,7 +67,7 @@ export default function Id() {
             title: item?.title,
             content: <div>
                 {
-                    item?.playUrl ?  <video style={{ width: '100%', height: '246px' }} src={item?.playUrl} controls></video>
+                    item?.playUrl ?  <video controlsList="nodownload" style={{ width: '100%', height: '246px' }} src={item?.playUrl} controls></video>
                     : <span>暂无视频源</span>
                 }
             </div>,

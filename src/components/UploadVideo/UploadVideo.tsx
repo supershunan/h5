@@ -311,6 +311,7 @@ export default function UploadVideo() {
                 {previewUrl && (
                     <div style={{ marginTop: 10, position: "relative" }}>
                         <video
+                            controlsList="nodownload"
                             src={previewUrl}
                             controls
                             style={{ width: "140px", height: "80px" }}

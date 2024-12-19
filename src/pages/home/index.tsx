@@ -101,6 +101,7 @@ export default function Home() {
 								width="100%"
 								height="200"
 								controls
+								controlsList="nodownload"
 							/>
 						))}
 					</div>
