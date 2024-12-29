@@ -269,16 +269,16 @@ export default function UploadVideo() {
     };
 
     const uploadVideo = async (file: File): Promise<ImageUploadItem> => {
-        if (file.size > 200 * 1024 * 1024) {
+        if (file.size > 100 * 1024 * 1024) {
             Toast.show({
-                content: `视频大小不能超过200Mb`,
+                content: `视频大小不能超过100Mb`,
             });
-            return Promise.reject('视频大小不能超过200Mb');
+            return Promise.reject('视频大小不能超过100Mb');
         }
-        console.log('pre ', file)
+        // console.log('pre ', file)
         // 压缩视频
-        const compressedFile = await videoCompress(file);
-        console.log('after', compressedFile)
+        const compressedFile = file;
+        // console.log('after', compressedFile)
         setVideoFile(compressedFile);
         
         return {
@@ -302,16 +302,16 @@ export default function UploadVideo() {
             // -b:a 128k: 音频比特率
             await ffmpeg.run(
                 '-i', inputFileName,
-            '-c:v', 'libx264',           // 使用 H.264 编码器
-            '-crf', '23',                // 压缩质量(18-28最佳，越小质量越好，默认23)
-            '-preset', 'slow',           // 压缩速度(越慢压缩效果越好：ultrafast,superfast,veryfast,faster,fast,medium,slow,slower,veryslow)
-            '-profile:v', 'high',        // 使用高规格编码
-            '-level', '4.0',             // 设置编码等级
-            '-movflags', '+faststart',   // 优化网络播放
-            '-c:a', 'aac',              // 音频编码器
-            '-b:a', '192k',             // 音频比特率提高到192k
-            '-ar', '44100',             // 音频采样率
-            'output.mp4'
+                '-c:v', 'libx264',           // 使用 H.264 编码器
+                '-crf', '23',                // 压缩质量(18-28最佳，越小质量越好，默认23)
+                '-preset', 'slow',         // 压缩速度(越慢压缩效果越好：ultrafast,superfast,veryfast,faster,fast,medium,slow,slower,veryslow)
+                '-profile:v', 'high',        // 使用高规格编码
+                '-level', '4.0',             // 设置编码等级
+                '-movflags', '+faststart',   // 优化网络播放
+                '-c:a', 'aac',              // 音频编码器
+                '-b:a', '192k',             // 音频比特率提高到192k
+                '-ar', '44100',             // 音频采样率
+                'output.mp4'
             );
 
             // 获取压缩后的文件

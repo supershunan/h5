@@ -122,5 +122,6 @@ export default defineConfig({
       'pathRewrite': { '^/newApi': '' },
     },
   },
+  esbuildMinifyIIFE: true,
   npmClient: 'pnpm',
 });
