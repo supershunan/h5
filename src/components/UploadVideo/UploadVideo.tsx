@@ -20,6 +20,18 @@ enum UploadType {
     add = "add",
 }
 
+const dataURLToBlob = (dataURL: string): Blob => {
+    const arr = dataURL.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+};
+
 export default function UploadVideo() {
     const { search } = useLocation();
     const urlParams = new URLSearchParams(search);
@@ -67,7 +79,7 @@ export default function UploadVideo() {
         Toast.show({
             content: status.status ? "上传/更新成功" : status.data,
         });
-        
+
         if (status.status) {
             form.resetFields();
             history.back();
@@ -236,10 +248,59 @@ export default function UploadVideo() {
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
-        setImgFile(file)
+        console.log('pre', file)
+        const compressFile = await imgCompress(file)
+        console.log('after', compressFile)
+        setImgFile(compressFile)
         return {
             url: URL.createObjectURL(file),
         };
+    };
+
+    // 图片压缩
+    const imgCompress = async (file: File): Promise<File> => {
+        return new Promise((resolve) => {
+            const img = new Image()
+            img.src = URL.createObjectURL(file)
+            img.onload = () => {
+                const canvas = document.createElement('canvas')
+                const ctx = canvas.getContext('2d')
+                const maxWidth = 750
+                const maxHeight = 422
+                let width = img.width
+                let height = img.height
+                if (img.width > maxWidth || img.height > maxHeight) {
+                    if (img.width > img.height) {
+                        width = maxWidth
+                        height = Math.round(img.height * maxWidth / img.width)
+                    } else {
+                        height = maxHeight
+                        width = Math.round(img.width * maxHeight / img.height)
+                    }
+                }
+                canvas.width = width
+                canvas.height = height
+                ctx?.drawImage(img, 0, 0, width, height)
+                const base64 = canvas.toDataURL('image/jpeg', 0.7)
+                const compressFile = dataURLToBlob(base64)
+                compressFile.lastModified = file.lastModified
+                compressFile.name = file.name
+                URL.revokeObjectURL(img.src)
+                resolve(compressFile as File)
+            }
+        })
+    }
+
+    const dataURLToBlob = (dataURL: string): Blob => {
+        const arr = dataURL.split(',');
+        const mime = arr[0].match(/:(.*?);/)?.[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
     };
 
     const uploadVideo = async (file: File): Promise<ImageUploadItem> => {
@@ -255,6 +316,10 @@ export default function UploadVideo() {
             url: URL.createObjectURL(file),
         };
     };
+
+    const videoCompress = async (file: File): Promise<File> => {
+        return file
+    }
 
     const uploadVideoChange = (url: string): string => {
         return url;
@@ -485,7 +550,7 @@ export default function UploadVideo() {
                     <TextArea placeholder="请输入" rows={2} showCount />
                 </Form.Item>
             </Form>
-            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display:`${visible ? '' : 'none'}`}}>
+            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display: `${visible ? '' : 'none'}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexFlow: 'column' }}>
                     <SpinLoading color='primary' />
                     <span>视频上传中进度：{uploadProgress}%</span>
