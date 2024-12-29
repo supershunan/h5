@@ -27,6 +27,8 @@ export default async function request(
         ...options?.headers,
         "Content-Type": "application/json",
         Authorization: Token,
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
     };
 
     const updateOptions: RequestInit = {

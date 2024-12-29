@@ -14,6 +14,8 @@ import "./index.less";
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
 import { AuditStatusEnum } from "@/utils/type/global.type";
+import { imgCompress } from "@/utils";
+import { createFFmpeg, fetchFile, FFmpeg } from '@ffmpeg/ffmpeg';
 
 enum UploadType {
     edit = "edit",
@@ -52,6 +54,17 @@ export default function UploadVideo() {
     const [videoFile, setVideoFile] = useState<File>();
     const [visible, setVisible] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
+    const [ffmpeg, setFFmpeg] = useState<FFmpeg>();
+
+    useEffect(() => {
+       // 初始化 FFmpeg
+       const ffmpeg = createFFmpeg({
+        corePath: '/src/assets/ffmpeg/ffmpeg-core.js',
+            log: true
+        });
+        ffmpeg.load();
+        setFFmpeg(ffmpeg);
+    }, []);
 
     useEffect(() => {
         videoClass();
@@ -248,59 +261,11 @@ export default function UploadVideo() {
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
-        console.log('pre', file)
-        const compressFile = await imgCompress(file)
-        console.log('after', compressFile)
+        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
         setImgFile(compressFile)
         return {
-            url: URL.createObjectURL(file),
+            url: URL.createObjectURL(compressFile),
         };
-    };
-
-    // 图片压缩
-    const imgCompress = async (file: File): Promise<File> => {
-        return new Promise((resolve) => {
-            const img = new Image()
-            img.src = URL.createObjectURL(file)
-            img.onload = () => {
-                const canvas = document.createElement('canvas')
-                const ctx = canvas.getContext('2d')
-                const maxWidth = 750
-                const maxHeight = 422
-                let width = img.width
-                let height = img.height
-                if (img.width > maxWidth || img.height > maxHeight) {
-                    if (img.width > img.height) {
-                        width = maxWidth
-                        height = Math.round(img.height * maxWidth / img.width)
-                    } else {
-                        height = maxHeight
-                        width = Math.round(img.width * maxHeight / img.height)
-                    }
-                }
-                canvas.width = width
-                canvas.height = height
-                ctx?.drawImage(img, 0, 0, width, height)
-                const base64 = canvas.toDataURL('image/jpeg', 0.7)
-                const compressFile = dataURLToBlob(base64)
-                compressFile.lastModified = file.lastModified
-                compressFile.name = file.name
-                URL.revokeObjectURL(img.src)
-                resolve(compressFile as File)
-            }
-        })
-    }
-
-    const dataURLToBlob = (dataURL: string): Blob => {
-        const arr = dataURL.split(',');
-        const mime = arr[0].match(/:(.*?);/)?.[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-            u8arr[n] = bstr.charCodeAt(n);
-        }
-        return new Blob([u8arr], { type: mime });
     };
 
     const uploadVideo = async (file: File): Promise<ImageUploadItem> => {
@@ -310,16 +275,60 @@ export default function UploadVideo() {
             });
             return Promise.reject('视频大小不能超过200Mb');
         }
-        setVideoFile(file)
-        console.log(URL.createObjectURL(file))
+        console.log('pre ', file)
+        // 压缩视频
+        const compressedFile = await videoCompress(file);
+        console.log('after', compressedFile)
+        setVideoFile(compressedFile);
+        
         return {
-            url: URL.createObjectURL(file),
+            url: URL.createObjectURL(compressedFile),
         };
     };
 
     const videoCompress = async (file: File): Promise<File> => {
-        return file
-    }
+        try {
+            
+
+            // 将文件加载到 FFmpeg
+            const inputFileName = 'input.mp4';
+            await ffmpeg.FS('writeFile', inputFileName, await fetchFile(file));
+
+            // 执行压缩命令
+            // -c:v libx264: 使用 H.264 编码
+            // -crf 28: 压缩质量(0-51,越大压缩率越高,质量越低)
+            // -preset medium: 压缩速度
+            // -c:a aac: 音频编码
+            // -b:a 128k: 音频比特率
+            await ffmpeg.run(
+                '-i', inputFileName,
+            '-c:v', 'libx264',           // 使用 H.264 编码器
+            '-crf', '23',                // 压缩质量(18-28最佳，越小质量越好，默认23)
+            '-preset', 'slow',           // 压缩速度(越慢压缩效果越好：ultrafast,superfast,veryfast,faster,fast,medium,slow,slower,veryslow)
+            '-profile:v', 'high',        // 使用高规格编码
+            '-level', '4.0',             // 设置编码等级
+            '-movflags', '+faststart',   // 优化网络播放
+            '-c:a', 'aac',              // 音频编码器
+            '-b:a', '192k',             // 音频比特率提高到192k
+            '-ar', '44100',             // 音频采样率
+            'output.mp4'
+            );
+
+            // 获取压缩后的文件
+            const data = ffmpeg.FS('readFile', 'output.mp4');
+            const compressedFile = new File([data.buffer], file.name, { type: 'video/mp4' });
+
+            console.log('compressedFile', compressedFile)
+            // 清理内存
+            ffmpeg.FS('unlink', inputFileName);
+            ffmpeg.FS('unlink', 'output.mp4');
+
+            return compressedFile;
+        } catch (error) {
+            console.error('视频压缩失败:', error);
+            return file; // 如果压缩失败则返回原文件
+        }
+    };
 
     const uploadVideoChange = (url: string): string => {
         return url;
