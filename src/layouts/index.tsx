@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { FC } from 'react'
 import {
   // Route,
@@ -24,27 +24,31 @@ export default function (props) {
       key: '/home',
       title: '首页',
       icon: <AppOutline />,
+      hidden: false
     },
     {
       key: '/upload',
       title: '上传',
       icon: <AddCircleOutline />,
+      hidden: window.location.host === 'dr.qfydkj.cn',
     },
     {
-      key: '/promation',
+      key: '/promation', 
       title: '推广',
       icon: <TravelOutline />,
+      hidden: false
     },
     {
       key: '/my',
       title: '我的',
       icon: <UserOutline />,
+      hidden: false
     },
   ]
 
   const location = useLocation()
   const { pathname } = location
-  const [activeKey, setActiveKey] = useState('/home');
+  const [activeKey, setActiveKey] = useState('/home'); 
 
   const setRouteActive = (value: string) => {
     setActiveKey(value)
@@ -58,7 +62,7 @@ export default function (props) {
       <div className={styles.bottomTabbar}>
         <TabBar activeKey={activeKey} onChange={value => setRouteActive(value)}>
           {tabs.map(item => (
-            <TabBar.Item key={item.key} icon={item.icon} title={item.title} />
+            !item.hidden && <TabBar.Item key={item.key} icon={item.icon} title={item.title} />
           ))}
         </TabBar>
       </div>
