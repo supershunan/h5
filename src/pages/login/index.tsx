@@ -37,6 +37,7 @@ export default function Login() {
     const [countTime, setCountTime] = useState<number>(COUNT_TIME);
     const [showTime, setShowTime] = useState(false);
     const timeInterval = useRef(-1);
+    const currenHost = useRef(location.host);
 
 
     const register = async (values: any): Promise<boolean> => {
@@ -204,7 +205,7 @@ export default function Login() {
     return (
         <div className='login'>
             <div className="login-content">
-                <img src={LoginBg} width={'100%'} />
+                <img src={currenHost.current === 'dr.qfydkj.cn' ? LoginBg : LoginBg2 } width={'100%'} />
                 <Form form={form} layout='horizontal' style={{ padding: '0 20px' }}>
                     <Form.Item
                         label='手机号'

@@ -3,7 +3,7 @@ import { CustomRequestInit } from "./request.type";
 import { Toast } from "antd-mobile";
 
 const isDev = process.env.NODE_ENV === 'development';
-const BASE_URL = isDev ? '/newApi/' : '/newApi/';
+const BASE_URL = isDev ? 'https://qingfeng.qfydkj.cn/' : 'https://qingfeng.qfydkj.cn/';
 
 export default async function request(
     path: string,

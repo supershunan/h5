@@ -111,17 +111,17 @@ export default defineConfig({
     },
     { path: '/*', component: '@/pages/404', layout: false },
   ],
-  proxy: {
-    '/apiFile': {
-      'target': 'https://ksys.qfyingshi.cn/',
-      'changeOrigin': true,
-    },
-    '/newApi': {
-      'target': 'https://ksys.qfyingshi.cn/',
-      'changeOrigin': true,
-      'pathRewrite': { '^/newApi': '' },
-    },
-  },
+  // proxy: {
+  //   '/apiFile': {
+  //     'target': 'https://qingfeng.qfydkj.cn/',
+  //     'changeOrigin': true,
+  //   },
+  //   '/newApi': {
+  //     'target': 'https://qingfeng.qfydkj.cn/',
+  //     'changeOrigin': true,
+  //     'pathRewrite': { '^/newApi': '' },
+  //   },
+  // },
   esbuildMinifyIIFE: true,
   npmClient: 'pnpm',
 });
