@@ -24,18 +24,6 @@ enum UploadType {
     add = "add",
 }
 
-const dataURLToBlob = (dataURL: string): Blob => {
-    const arr = dataURL.split(',');
-    const mime = arr[0].match(/:(.*?);/)?.[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-};
-
 export default function UploadVideo() {
     const { search } = useLocation();
     const urlParams = new URLSearchParams(search);
@@ -58,6 +46,7 @@ export default function UploadVideo() {
     const [uploadProgress, setUploadProgress] = useState(0)
     const [ffmpeg] = useState<FFmpeg>(() => new FFmpeg());
     const [compressing, setCompressing] = useState(false);
+    const [compressComplete, setCompressComplete] = useState(false);
 
     useEffect(() => {
         const loadFFmpeg = async () => {
@@ -300,6 +289,7 @@ export default function UploadVideo() {
     const videoCompress = async (file: File): Promise<File> => {
         try {
             setCompressing(true); // 开始压缩时显示 loading
+            setCompressComplete(false); // 重置完成状态
             // 将文件加载到 FFmpeg
             const inputFileName = 'input.mp4';
             await ffmpeg.writeFile(inputFileName, await fetchFile(file));
@@ -309,24 +299,25 @@ export default function UploadVideo() {
 
                 // 视频编码设置
                 '-c:v', 'libx264',                     // 使用 H.264 编码器
-                '-crf', '28',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
-                '-preset', 'veryfast',                 // 编码速度预设: ultrafast(最快,质量最差) -> veryslow(最慢,质量最好)
-                '-profile:v', 'baseline',              // H.264 配置: baseline(适合移动设备,兼容性好)
-                '-vf', 'scale=-2:720',                 // 视频尺寸: 高度720p,宽度自适应(-2)
-                '-r', '24',                            // 帧率: 每秒24帧(电影标准)
-                '-maxrate', '1000k',                   // 最大视频码率: 1000kbps
+                '-crf', '23',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
+                '-preset', 'veryfast',                 // 编码速度预设
+                '-profile:v', 'baseline',              // H.264 配置
+                '-vf', 'scale=1920:1080',             // 固定分辨率为1920x1080
+                '-r', '25',                            // 帧率
+                '-b:v', '1020k',                       // 视频比特率(总比特率1084k - 音频比特率64k)
+                '-maxrate', '1020k',                   // 最大视频码率
                 '-bufsize', '1500k',                   // 编码器缓冲区大小
-                '-movflags', '+faststart',             // 优化网络播放(元数据前置)
+                '-movflags', '+faststart',             // 优化网络播放
 
                 // 音频编码设置
-                '-c:a', 'aac',                         // 音频编码器: AAC格式(兼容性好)
-                '-b:a', '96k',                         // 音频码率: 96kbps(相对128k节省空间)
-                '-ar', '44100',                        // 音频采样率: 44.1kHz(CD音质)
-                '-ac', '1',                            // 声道数: 1=单声道(省空间),2=立体声
-                '-af', 'volume=1.5',                   // 音频滤镜: 调整音量(可选)
+                '-c:a', 'aac',                         // 音频编码器
+                '-b:a', '64k',                         // 固定音频码率为64k
+                '-ar', '44100',                        // 音频采样率
+                '-ac', '1',                            // 声道数
+                '-af', 'volume=1.5',                   // 音频滤镜
 
                 // 其他设置
-                '-threads', '0',                       // CPU线程数: 0=自动选择最优
+                '-threads', '0',                       // CPU线程数
                 '-y',                                  // 自动覆盖输出文件
                 'output.mp4'                           // 输出文件名
             ]);
@@ -340,6 +331,7 @@ export default function UploadVideo() {
             await ffmpeg.deleteFile(inputFileName);
             await ffmpeg.deleteFile('output.mp4');
 
+            setCompressComplete(true); // 设置压缩完成
             return compressedFile;
         } catch (error) {
             console.error('视频压缩失败:', error);
@@ -473,8 +465,18 @@ export default function UploadVideo() {
                         </div>
                     }
                 >
-                    {/* <VideoUploader upload={uploadVideo} onChange={uploadVideoChange} value={fileVideo} /> */}
-                    {videoUploadEl}
+                    <div style={{ display: 'flex', alignItems: 'end' }}>
+                        {videoUploadEl}
+                        {compressing && (
+                            <>
+                                <SpinLoading color='primary' style={{ marginLeft: '10px' }} />
+                                <span style={{ marginLeft: '5px' }}>转码中... 请勿退出！！！</span>
+                            </>
+                        )}
+                        {!compressing && compressComplete && (
+                            <span style={{ marginLeft: '10px', color: '#52c41a' }}>转码成功</span>
+                        )}
+                    </div>
                 </Form.Item>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Form.Item
@@ -578,13 +580,13 @@ export default function UploadVideo() {
                     <TextArea placeholder="请输入" rows={2} showCount />
                 </Form.Item>
             </Form>
-            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display: `${visible || compressing ? '' : 'none'}` }}>
+            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display: `${visible ? '' : 'none'}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexFlow: 'column' }}>
                     <SpinLoading color='primary' />
-                    <span>{compressing ? '视频压缩中...' : `视频上传中进度：${uploadProgress}%`}</span>
+                    <span>{`视频上传中进度：${uploadProgress}%`}</span>
                 </div>
             </div>
-            <Mask visible={visible || compressing} />
+            <Mask visible={visible} />
         </div>
     );
 }

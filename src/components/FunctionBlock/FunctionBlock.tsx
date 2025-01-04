@@ -7,6 +7,10 @@ import { FunctionBlockProps, JumpTypeEnum, BlockContent } from './type';
 
 export default function FunctionBlock(props: FunctionBlockProps) {
     const { blockContent, style } = props;
+    const copyURl = [
+        'https://czz.qfydkj.cn/',
+        'https://dr.qfydkj.cn/'
+    ]
     const handleClick = (type: string, content: string) => {
         if (type === JumpTypeEnum['router']) {
             history.push(content)
@@ -20,10 +24,18 @@ export default function FunctionBlock(props: FunctionBlockProps) {
                title: '请复制到浏览器打开',
                content: 
                <div>
-                    <span>{window.location.origin}/login?id={content}</span>
-                    <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${window.location.origin}/login?id=${content}`)} block color='primary' size='mini'>
-                    复制
-                    </Button>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+                        <span>{copyURl[0]}/login?id={content}</span>
+                        <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${copyURl[0]}/login?id=${content}`)} block color='primary' size='mini'>
+                        复制
+                        </Button>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',  padding: '10px 0' }}>
+                        <span>{copyURl[1]}/login?id={content}</span>
+                        <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${copyURl[1]}/login?id=${content}`)} block color='primary' size='mini'>
+                        复制
+                        </Button>
+                    </div>
                </div>,
                 closeOnMaskClick: true,
             })
