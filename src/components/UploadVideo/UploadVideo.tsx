@@ -268,12 +268,12 @@ export default function UploadVideo() {
     };
 
     const uploadVideo = async (file: File): Promise<ImageUploadItem> => {
-        // if (file.size > 100 * 1024 * 1024) {
-        //     Toast.show({
-        //         content: `视频大小不能超过100Mb`,
-        //     });
-        //     return Promise.reject('视频大小不能超过100Mb');
-        // }
+        if (file.size > 1024 * 1024 * 1024) {
+            Toast.show({
+                content: `视频大小不能超过1G`,
+            });
+            return Promise.reject('视频大小不能超过1G');
+        }
         console.log('pre ', file)
         const compressedFile = await videoCompress(file);
         // 压缩视频
@@ -430,7 +430,7 @@ export default function UploadVideo() {
                 onFinish={onFinish}
                 initialValues={videoDetail}
                 footer={
-                    <Button block type="submit" color="primary" size="large">
+                    <Button block type="submit" color="primary" size="large" disabled={!compressComplete}>
                         提交
                     </Button>
                 }
@@ -461,7 +461,7 @@ export default function UploadVideo() {
                     label={
                         <div className="uploadTip">
                             <span className="uploadHeadtitle">上传视频</span>
-                            <span className="uploadSubtitle">小于200Mb</span>
+                            <span className="uploadSubtitle">只支持16/9的视频且小于1G</span>
                         </div>
                     }
                 >
@@ -470,7 +470,7 @@ export default function UploadVideo() {
                         {compressing && (
                             <>
                                 <SpinLoading color='primary' style={{ marginLeft: '10px' }} />
-                                <span style={{ marginLeft: '5px' }}>转码中... 请勿退出！！！</span>
+                                <span style={{ marginLeft: '5px' }}>转码中... 预计5分钟,请勿退出！！！</span>
                             </>
                         )}
                         {!compressing && compressComplete && (
@@ -573,9 +573,6 @@ export default function UploadVideo() {
                 <Form.Item name="title" label="视频名" rules={[{ required: true }]}>
                     <Input placeholder="请输入" />
                 </Form.Item>
-                {/* <Form.Item name="useTime" label="使用时间" rules={[{ required: true }]}>
-                    <Input placeholder="请输入" />
-                </Form.Item> */}
                 <Form.Item name="info" label="简介">
                     <TextArea placeholder="请输入" rows={2} showCount />
                 </Form.Item>
