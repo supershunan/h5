@@ -15,7 +15,9 @@ import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
 import { AuditStatusEnum } from "@/utils/type/global.type";
 import { imgCompress } from "@/utils";
-import { createFFmpeg, fetchFile, FFmpeg } from '@ffmpeg/ffmpeg';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from '@ffmpeg/util';
+import { toBlobURL } from '@ffmpeg/util';
 
 enum UploadType {
     edit = "edit",
@@ -54,16 +56,24 @@ export default function UploadVideo() {
     const [videoFile, setVideoFile] = useState<File>();
     const [visible, setVisible] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
-    const [ffmpeg, setFFmpeg] = useState<FFmpeg>();
+    const [ffmpeg] = useState<FFmpeg>(() => new FFmpeg());
+    const [compressing, setCompressing] = useState(false);
 
     useEffect(() => {
-       // 初始化 FFmpeg
-       const ffmpeg = createFFmpeg({
-        corePath: '/src/assets/ffmpeg/ffmpeg-core.js',
-            log: true
-        });
-        ffmpeg.load();
-        setFFmpeg(ffmpeg);
+        const loadFFmpeg = async () => {
+            try {
+                // 加载 FFmpeg
+                await ffmpeg.load({
+                    coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+                    wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm',
+                });
+                console.log('FFmpeg 加载成功');
+            } catch (error) {
+                console.error('FFmpeg 加载失败:', error);
+            }
+        };
+
+        loadFFmpeg();
     }, []);
 
     useEffect(() => {
@@ -269,18 +279,19 @@ export default function UploadVideo() {
     };
 
     const uploadVideo = async (file: File): Promise<ImageUploadItem> => {
-        if (file.size > 100 * 1024 * 1024) {
-            Toast.show({
-                content: `视频大小不能超过100Mb`,
-            });
-            return Promise.reject('视频大小不能超过100Mb');
-        }
-        // console.log('pre ', file)
+        // if (file.size > 100 * 1024 * 1024) {
+        //     Toast.show({
+        //         content: `视频大小不能超过100Mb`,
+        //     });
+        //     return Promise.reject('视频大小不能超过100Mb');
+        // }
+        console.log('pre ', file)
+        const compressedFile = await videoCompress(file);
         // 压缩视频
-        const compressedFile = file;
-        // console.log('after', compressedFile)
+        // const compressedFile = file;
+        console.log('after', compressedFile)
         setVideoFile(compressedFile);
-        
+
         return {
             url: URL.createObjectURL(compressedFile),
         };
@@ -288,45 +299,53 @@ export default function UploadVideo() {
 
     const videoCompress = async (file: File): Promise<File> => {
         try {
-            
-
+            setCompressing(true); // 开始压缩时显示 loading
             // 将文件加载到 FFmpeg
             const inputFileName = 'input.mp4';
-            await ffmpeg.FS('writeFile', inputFileName, await fetchFile(file));
-
+            await ffmpeg.writeFile(inputFileName, await fetchFile(file));
             // 执行压缩命令
-            // -c:v libx264: 使用 H.264 编码
-            // -crf 28: 压缩质量(0-51,越大压缩率越高,质量越低)
-            // -preset medium: 压缩速度
-            // -c:a aac: 音频编码
-            // -b:a 128k: 音频比特率
-            await ffmpeg.run(
-                '-i', inputFileName,
-                '-c:v', 'libx264',           // 使用 H.264 编码器
-                '-crf', '23',                // 压缩质量(18-28最佳，越小质量越好，默认23)
-                '-preset', 'slow',         // 压缩速度(越慢压缩效果越好：ultrafast,superfast,veryfast,faster,fast,medium,slow,slower,veryslow)
-                '-profile:v', 'high',        // 使用高规格编码
-                '-level', '4.0',             // 设置编码等级
-                '-movflags', '+faststart',   // 优化网络播放
-                '-c:a', 'aac',              // 音频编码器
-                '-b:a', '192k',             // 音频比特率提高到192k
-                '-ar', '44100',             // 音频采样率
-                'output.mp4'
-            );
+            await ffmpeg.exec([
+                '-i', inputFileName,                    // 输入文件
+
+                // 视频编码设置
+                '-c:v', 'libx264',                     // 使用 H.264 编码器
+                '-crf', '28',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
+                '-preset', 'veryfast',                 // 编码速度预设: ultrafast(最快,质量最差) -> veryslow(最慢,质量最好)
+                '-profile:v', 'baseline',              // H.264 配置: baseline(适合移动设备,兼容性好)
+                '-vf', 'scale=-2:720',                 // 视频尺寸: 高度720p,宽度自适应(-2)
+                '-r', '24',                            // 帧率: 每秒24帧(电影标准)
+                '-maxrate', '1000k',                   // 最大视频码率: 1000kbps
+                '-bufsize', '1500k',                   // 编码器缓冲区大小
+                '-movflags', '+faststart',             // 优化网络播放(元数据前置)
+
+                // 音频编码设置
+                '-c:a', 'aac',                         // 音频编码器: AAC格式(兼容性好)
+                '-b:a', '96k',                         // 音频码率: 96kbps(相对128k节省空间)
+                '-ar', '44100',                        // 音频采样率: 44.1kHz(CD音质)
+                '-ac', '1',                            // 声道数: 1=单声道(省空间),2=立体声
+                '-af', 'volume=1.5',                   // 音频滤镜: 调整音量(可选)
+
+                // 其他设置
+                '-threads', '0',                       // CPU线程数: 0=自动选择最优
+                '-y',                                  // 自动覆盖输出文件
+                'output.mp4'                           // 输出文件名
+            ]);
+
 
             // 获取压缩后的文件
-            const data = ffmpeg.FS('readFile', 'output.mp4');
-            const compressedFile = new File([data.buffer], file.name, { type: 'video/mp4' });
+            const data = await ffmpeg.readFile('output.mp4');
+            const compressedFile = new File([data], file.name, { type: 'video/mp4' });
 
-            console.log('compressedFile', compressedFile)
             // 清理内存
-            ffmpeg.FS('unlink', inputFileName);
-            ffmpeg.FS('unlink', 'output.mp4');
+            await ffmpeg.deleteFile(inputFileName);
+            await ffmpeg.deleteFile('output.mp4');
 
             return compressedFile;
         } catch (error) {
             console.error('视频压缩失败:', error);
             return file; // 如果压缩失败则返回原文件
+        } finally {
+            setCompressing(false); // 无论成功失败都关闭 loading
         }
     };
 
@@ -559,13 +578,13 @@ export default function UploadVideo() {
                     <TextArea placeholder="请输入" rows={2} showCount />
                 </Form.Item>
             </Form>
-            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display: `${visible ? '' : 'none'}` }}>
+            <div style={{ position: 'fixed', top: "50%", left: "50%", transform: "translate(-50%, -50%)", display: `${visible || compressing ? '' : 'none'}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexFlow: 'column' }}>
                     <SpinLoading color='primary' />
-                    <span>视频上传中进度：{uploadProgress}%</span>
+                    <span>{compressing ? '视频压缩中...' : `视频上传中进度：${uploadProgress}%`}</span>
                 </div>
             </div>
-            <Mask visible={visible} />
+            <Mask visible={visible || compressing} />
         </div>
     );
 }

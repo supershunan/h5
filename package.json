@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@ffmpeg/core": "^0.10.0",
-    "@ffmpeg/ffmpeg": "^0.10.1",
+    "@ffmpeg/ffmpeg": "^0.12.6",
+    "@ffmpeg/util": "0.12.1",
     "antd-mobile": "^5.37.1",
     "antd-mobile-icons": "^0.3.0",
     "cropperjs": "^1.6.2",

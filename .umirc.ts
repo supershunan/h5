@@ -111,17 +111,12 @@ export default defineConfig({
     },
     { path: '/*', component: '@/pages/404', layout: false },
   ],
-  // proxy: {
-  //   '/apiFile': {
-  //     'target': 'https://qingfeng.qfydkj.cn/',
-  //     'changeOrigin': true,
-  //   },
-  //   '/newApi': {
-  //     'target': 'https://qingfeng.qfydkj.cn/',
-  //     'changeOrigin': true,
-  //     'pathRewrite': { '^/newApi': '' },
-  //   },
-  // },
+  chainWebpack: (memo) => {
+    memo.devServer.set('headers', {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    });
+  },
   esbuildMinifyIIFE: true,
   npmClient: 'pnpm',
 });
