@@ -13,7 +13,8 @@ import {
     PromotionEnum,
 } from "./type";
 import "./index.less";
-import ReactCrop, { Crop } from "react-image-crop";
+import { Crop, ReactCrop } from 'react-image-crop' // 添加引入
+import 'react-image-crop/dist/ReactCrop.css'  // 添加引入
 
 export default function CollectionManagement() {
     const [data, setData] = useState<any[]>([]);
@@ -40,8 +41,8 @@ export default function CollectionManagement() {
         unit: 'px',
         x: 25,
         y: 25,
-        width: 121,  // 16
-        height: 68, // 9
+        width: 121,
+        height: 68,
     });
     const [cropSrc, setCropSrc] = useState<string>();
     const [showCrop, setShowCrop] = useState(false);
