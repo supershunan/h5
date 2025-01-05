@@ -219,27 +219,27 @@ export default function UploadVideo() {
     interface CropCompleteEvent extends CustomEvent {
         detail: File;
     }
-    
+
     async function beforeUpload(file: File): Promise<File | null> {
         if (file.size > 1024 * 1024) {
             Toast.show('请选择小于 1M 的图片')
             return null
         }
-        
+
         return new Promise((resolve) => {
             const reader = new FileReader()
             reader.onload = () => {
                 setCropSrc(reader.result as string)
                 setShowCrop(true)
                 setImgFile(file)
-                
+
                 // 修改事件监听器的类型
                 const handleCropDone = (event: Event) => {
                     const cropEvent = event as CropCompleteEvent;
                     resolve(cropEvent.detail)
                     window.removeEventListener('cropComplete', handleCropDone)
                 }
-                
+
                 window.addEventListener('cropComplete', handleCropDone)
             }
             reader.readAsDataURL(file)
@@ -462,14 +462,14 @@ export default function UploadVideo() {
 
     const handleCropComplete = async () => {
         if (!imgRef.current || !crop) return
-    
+
         const canvas = document.createElement('canvas')
         const scaleX = imgRef.current.naturalWidth / imgRef.current.width
         const scaleY = imgRef.current.naturalHeight / imgRef.current.height
         canvas.width = crop.width
         canvas.height = crop.height
         const ctx = canvas.getContext('2d')
-    
+
         ctx?.drawImage(
             imgRef.current,
             crop.x * scaleX,
@@ -481,17 +481,17 @@ export default function UploadVideo() {
             crop.width,
             crop.height
         )
-    
+
         canvas.toBlob(async (blob) => {
             if (blob) {
                 const file = new File([blob], 'cropped.png', { type: 'image/png' })
                 const compressedFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
                 setImgFile(compressedFile)
-                
+
                 // 创建预览URL并更新UI
                 const previewUrl = URL.createObjectURL(compressedFile)
                 setFileImgList([{ url: previewUrl }])
-                
+
                 // 触发裁剪完成事件
                 window.dispatchEvent(new CustomEvent('cropComplete', { detail: compressedFile }))
                 setShowCrop(false)
@@ -507,7 +507,7 @@ export default function UploadVideo() {
                 onFinish={onFinish}
                 initialValues={videoDetail}
                 footer={
-                    <Button block type="submit" color="primary" size="large" disabled={!compressComplete}>
+                    <Button block type="submit" color="primary" size="large"  disabled={!compressComplete}>
                         提交
                     </Button>
                 }
@@ -542,19 +542,28 @@ export default function UploadVideo() {
                         </div>
                     }
                 >
-                    <div style={{ display: 'flex', alignItems: 'end' }}>
-                        {videoUploadEl}
+                    {videoUploadEl}
+                </Form.Item>
+                <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', bottom: '-0', right: '0', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
                         {compressing && (
                             <>
-                                <SpinLoading color='primary' style={{ marginLeft: '10px' }} />
-                                <span style={{ marginLeft: '5px' }}>转码中... 预计5分钟,请勿退出！！！</span>
+                                <SpinLoading color='primary' style={{ marginRight: '5px' }} />
+                                <span>
+                                    <div>
+                                        转码中...
+                                    </div>
+                                    <div>
+                                        预计5分钟,请勿退出！！！
+                                    </div>
+                                </span>
                             </>
                         )}
                         {!compressing && compressComplete && (
-                            <span style={{ marginLeft: '10px', color: '#52c41a' }}>转码成功</span>
+                            <span style={{ color: '#52c41a' }}>转码成功</span>
                         )}
                     </div>
-                </Form.Item>
+                </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <Form.Item
                         name="money"
