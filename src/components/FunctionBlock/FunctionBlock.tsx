@@ -24,17 +24,23 @@ export default function FunctionBlock(props: FunctionBlockProps) {
                title: '请复制到浏览器打开',
                content: 
                <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
-                        <span>{copyURl[0]}/login?id={content}</span>
-                        <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${copyURl[0]}/login?id=${content}`)} block color='primary' size='mini'>
-                        复制
-                        </Button>
+                    <div>
+                        <div style={{ fontWeight: 'bold' }}>创作者邀请链接</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+                            <span>{copyURl[0]}/login?id={content}</span>
+                            <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${copyURl[0]}/login?id=${content}`)} block color='primary' size='mini'>
+                            复制
+                            </Button>
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',  padding: '10px 0' }}>
-                        <span>{copyURl[1]}/login?id={content}</span>
-                        <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${copyURl[1]}/login?id=${content}`)} block color='primary' size='mini'>
-                        复制
-                        </Button>
+                    <div>
+                        <div style={{ fontWeight: 'bold' }}>推广员邀请链接</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',  padding: '10px 0' }}>
+                            <span>{copyURl[1]}/login?id={content}</span>
+                            <Button style={{ width:'70px', float: 'right' }} onClick={() => handleCopy(`${copyURl[1]}/login?id=${content}`)} block color='primary' size='mini'>
+                            复制
+                            </Button>
+                        </div>
                     </div>
                </div>,
                 closeOnMaskClick: true,

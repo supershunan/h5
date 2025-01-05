@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem, TextArea } from "antd-mobile";
+import React, { useEffect, useRef, useState } from "react";
+import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem, TextArea, Mask } from "antd-mobile";
 import { history } from "umi";
 import { Action } from "antd-mobile/es/components/popover";
 import NavBarBack from "@/components/NavBarBack/NavBarBack";
@@ -13,6 +13,7 @@ import {
     PromotionEnum,
 } from "./type";
 import "./index.less";
+import ReactCrop, { Crop } from "react-image-crop";
 
 export default function CollectionManagement() {
     const [data, setData] = useState<any[]>([]);
@@ -35,6 +36,16 @@ export default function CollectionManagement() {
     const [params, setParmas] = useState<{ page: number, rows: number, type: string }>({ page: 1, rows: 5, type: 'folder' });
     const [isLoad, setIsLoad] = useState(false);
     const [imgFile, setImgFile] = useState<File>();
+    const [crop, setCrop] = useState<Crop>({
+        unit: 'px',
+        x: 25,
+        y: 25,
+        width: 121,  // 16
+        height: 68, // 9
+    });
+    const [cropSrc, setCropSrc] = useState<string>();
+    const [showCrop, setShowCrop] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
 
     useEffect(() => {
         if (isLoad) {
@@ -265,12 +276,33 @@ export default function CollectionManagement() {
         });
     };
 
+    interface CropCompleteEvent extends CustomEvent {
+        detail: File;
+    }
+
     const beforeUpload = (file: File, files: File[]) => {
         if (file.size > 1024 * 1024) {
             Toast.show('请选择小于 1M 的图片')
             return null
         }
-        return file
+        return new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => {
+                setCropSrc(reader.result as string)
+                setShowCrop(true)
+                setImgFile(file)
+
+                // 修改事件监听器的类型
+                const handleCropDone = (event: Event) => {
+                    const cropEvent = event as CropCompleteEvent;
+                    resolve(cropEvent.detail)
+                    window.removeEventListener('cropComplete', handleCropDone)
+                }
+
+                window.addEventListener('cropComplete', handleCropDone)
+            }
+            reader.readAsDataURL(file)
+        })
     }
 
     const upload = async (file: File): Promise<ImageUploadItem> => {
@@ -296,6 +328,45 @@ export default function CollectionManagement() {
         return {
             url: data.data,
         }
+    }
+
+    const handleCropComplete = async () => {
+        if (!imgRef.current || !crop) return
+
+        const canvas = document.createElement('canvas')
+        const scaleX = imgRef.current.naturalWidth / imgRef.current.width
+        const scaleY = imgRef.current.naturalHeight / imgRef.current.height
+        canvas.width = crop.width
+        canvas.height = crop.height
+        const ctx = canvas.getContext('2d')
+
+        ctx?.drawImage(
+            imgRef.current,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            crop.width * scaleX,
+            crop.height * scaleY,
+            0,
+            0,
+            crop.width,
+            crop.height
+        )
+
+        canvas.toBlob(async (blob) => {
+            if (blob) {
+                const file = new File([blob], 'cropped.png', { type: 'image/png' })
+                const compressedFile = file;
+                setImgFile(compressedFile)
+
+                // 创建预览URL并更新UI
+                const previewUrl = URL.createObjectURL(compressedFile)
+                setFileList([{ url: previewUrl }])
+
+                // 触发裁剪完成事件
+                window.dispatchEvent(new CustomEvent('cropComplete', { detail: compressedFile }))
+                setShowCrop(false)
+            }
+        }, 'image/png')
     }
 
     return (
@@ -405,6 +476,26 @@ export default function CollectionManagement() {
                 </Popup>
             </div>
             <InfiniteScroll loadMore={getCollectionList} hasMore={hasMore} />
+            <Mask visible={visible} />
+            {showCrop && cropSrc && (
+                <div className="crop-modal">
+                    <div style={{ marginBottom: '10px', textAlign: 'center' }}>
+                        当前裁剪尺寸: {Math.round(crop.width)} x {Math.round(crop.height)} 像素
+                    </div>
+                    <ReactCrop
+                        crop={crop}
+                        onChange={c => setCrop(c)}
+                        aspect={16 / 9}
+                    >
+                        <img ref={imgRef} src={cropSrc} />
+                    </ReactCrop>
+                    <div className="crop-actions">
+                        <Button onClick={handleCropComplete}>确认</Button>
+                        <Button onClick={() => setShowCrop(false)}>取消</Button>
+                    </div>
+                </div>
+            )}
         </div>
+        
     );
 }
