@@ -18,6 +18,8 @@ import { imgCompress } from "@/utils";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 import { toBlobURL } from '@ffmpeg/util';
+import { Crop, ReactCrop } from 'react-image-crop'
+import 'react-image-crop/dist/ReactCrop.css'
 
 enum UploadType {
     edit = "edit",
@@ -47,6 +49,16 @@ export default function UploadVideo() {
     const [ffmpeg] = useState<FFmpeg>(() => new FFmpeg());
     const [compressing, setCompressing] = useState(false);
     const [compressComplete, setCompressComplete] = useState(false);
+    const [crop, setCrop] = useState<Crop>({
+        unit: 'px',
+        x: 25,
+        y: 25,
+        width: 121,  // 16
+        height: 68, // 9
+    });
+    const [cropSrc, setCropSrc] = useState<string>();
+    const [showCrop, setShowCrop] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
 
     useEffect(() => {
         const loadFFmpeg = async () => {
@@ -204,8 +216,34 @@ export default function UploadVideo() {
         };
     };
 
-    function beforeUpload(file: File) {
-        return file;
+    interface CropCompleteEvent extends CustomEvent {
+        detail: File;
+    }
+    
+    async function beforeUpload(file: File): Promise<File | null> {
+        if (file.size > 1024 * 1024) {
+            Toast.show('请选择小于 1M 的图片')
+            return null
+        }
+        
+        return new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => {
+                setCropSrc(reader.result as string)
+                setShowCrop(true)
+                setImgFile(file)
+                
+                // 修改事件监听器的类型
+                const handleCropDone = (event: Event) => {
+                    const cropEvent = event as CropCompleteEvent;
+                    resolve(cropEvent.detail)
+                    window.removeEventListener('cropComplete', handleCropDone)
+                }
+                
+                window.addEventListener('cropComplete', handleCropDone)
+            }
+            reader.readAsDataURL(file)
+        })
     }
 
     const startUploadImg = async () => {
@@ -422,6 +460,45 @@ export default function UploadVideo() {
         );
     }, [fileVideo]);
 
+    const handleCropComplete = async () => {
+        if (!imgRef.current || !crop) return
+    
+        const canvas = document.createElement('canvas')
+        const scaleX = imgRef.current.naturalWidth / imgRef.current.width
+        const scaleY = imgRef.current.naturalHeight / imgRef.current.height
+        canvas.width = crop.width
+        canvas.height = crop.height
+        const ctx = canvas.getContext('2d')
+    
+        ctx?.drawImage(
+            imgRef.current,
+            crop.x * scaleX,
+            crop.y * scaleY,
+            crop.width * scaleX,
+            crop.height * scaleY,
+            0,
+            0,
+            crop.width,
+            crop.height
+        )
+    
+        canvas.toBlob(async (blob) => {
+            if (blob) {
+                const file = new File([blob], 'cropped.png', { type: 'image/png' })
+                const compressedFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
+                setImgFile(compressedFile)
+                
+                // 创建预览URL并更新UI
+                const previewUrl = URL.createObjectURL(compressedFile)
+                setFileImgList([{ url: previewUrl }])
+                
+                // 触发裁剪完成事件
+                window.dispatchEvent(new CustomEvent('cropComplete', { detail: compressedFile }))
+                setShowCrop(false)
+            }
+        }, 'image/png')
+    }
+
     return (
         <div>
             <Form
@@ -584,6 +661,24 @@ export default function UploadVideo() {
                 </div>
             </div>
             <Mask visible={visible} />
+            {showCrop && cropSrc && (
+                <div className="crop-modal">
+                    <div style={{ marginBottom: '10px', textAlign: 'center' }}>
+                        当前裁剪尺寸: {Math.round(crop.width)} x {Math.round(crop.height)} 像素
+                    </div>
+                    <ReactCrop
+                        crop={crop}
+                        onChange={c => setCrop(c)}
+                        aspect={16 / 9}
+                    >
+                        <img ref={imgRef} src={cropSrc} />
+                    </ReactCrop>
+                    <div className="crop-actions">
+                        <Button onClick={handleCropComplete}>确认</Button>
+                        <Button onClick={() => setShowCrop(false)}>取消</Button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

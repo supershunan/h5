@@ -117,6 +117,16 @@ export default defineConfig({
       'Cross-Origin-Embedder-Policy': 'require-corp',
     });
   },
+  proxy: {
+    '/apiFile': {
+      target: 'https://qingfeng.qfydkj.cn/',
+      changeOrigin: true,
+    },
+    // '/newApi': {
+    //   target: 'https://qingfeng.qfydkj.cn/',
+    //   changeOrigin: true
+    // }
+  },
   esbuildMinifyIIFE: true,
   npmClient: 'pnpm',
 });

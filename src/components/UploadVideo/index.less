@@ -30,3 +30,29 @@
 .adm-image-uploader-cell-image {
     width: 140px;
 }
+
+.crop-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+    img {
+        max-width: 100%;
+        max-height: 70vh;
+    }
+
+    .crop-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+}
