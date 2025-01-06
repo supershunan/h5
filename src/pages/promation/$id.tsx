@@ -17,9 +17,11 @@ export default function TaskDetail() {
         promotionUrl: '',
         promotionDetail: '',
     });
+    const [promotionDetails, setPromotionDetails] = useState<any>({});
 
     useEffect(() => {
         getPromationDetail();
+        getpromotionDetails();
     }, []);
 
     const handleCopy = (text: string) => {
@@ -58,6 +60,12 @@ export default function TaskDetail() {
         res.code === RequstStatusEnum.success && setPromationDetails(res.data)
     }
 
+    const getpromotionDetails = async () => {
+        const res = await request('/newApi/gconfig/getByType/promotation_detail', { method: 'GET' });
+        console.log(res, 'res')
+        res.code === RequstStatusEnum.success && setPromotionDetails(res.data[0])
+    }
+
     const goPromotion = () => {
         history.push(`/applyForPromotion/${id}`)
     }
@@ -86,7 +94,7 @@ export default function TaskDetail() {
                         </div>
                     </div>
                     <div style={{ marginTop: '20px' }}>
-                        <div dangerouslySetInnerHTML={{ __html: promationDetails?.promotionDetail }} />
+                        <div dangerouslySetInnerHTML={{ __html: promotionDetails?.val }} />
                     </div>
                 </Card>
                 <div className='floatBtn'>

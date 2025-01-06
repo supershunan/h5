@@ -221,8 +221,8 @@ export default function UploadVideo() {
     }
 
     async function beforeUpload(file: File): Promise<File | null> {
-        if (file.size > 1024 * 1024) {
-            Toast.show('请选择小于 1M 的图片')
+        if (file.size > 2 * 1024 * 1024) {
+            Toast.show('请选择小于 2M 的图片')
             return null
         }
 
@@ -337,12 +337,12 @@ export default function UploadVideo() {
 
                 // 视频编码设置
                 '-c:v', 'libx264',                     // 使用 H.264 编码器
-                '-crf', '34',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
+                '-crf', '33',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
                 '-preset', 'veryfast',                 // 编码速度预设
                 '-profile:v', 'baseline',              // H.264 配置
                 '-vf', 'scale=1920:1080',              // 固定分辨率为1920x1080
                 '-r', '25',                            // 帧率
-                '-b:v', '576k',                       // 视频比特率(总比特率1364k - 音频比特率64k)
+                '-b:v', '718k',                       // 视频比特率(总比特率1364k - 音频比特率64k)
                 '-maxrate', '3072k',                   // 最大视频码率
                 '-bufsize', '102400k',                 // 编码器缓冲区大小
                 '-movflags', '+faststart',             // 优化网络播放
