@@ -282,8 +282,8 @@ export default function CollectionManagement() {
     }
 
     const beforeUpload = (file: File, files: File[]) => {
-        if (file.size > 1024 * 1024) {
-            Toast.show('请选择小于 1M 的图片')
+        if (file.size > 2 * 1024 * 1024) {
+            Toast.show('请选择小于 2M 的图片')
             return null
         }
         return new Promise((resolve) => {
