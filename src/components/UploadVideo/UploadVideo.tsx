@@ -507,7 +507,7 @@ export default function UploadVideo() {
                 onFinish={onFinish}
                 initialValues={videoDetail}
                 footer={
-                    <Button block type="submit" color="primary" size="large"  disabled={!compressComplete}>
+                    <Button block type="submit" color="primary" size="large"  disabled={type === UploadType.add ? !compressComplete : false}>
                         提交
                     </Button>
                 }

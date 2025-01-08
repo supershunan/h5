@@ -22,7 +22,7 @@ export default function ApplyForPromotion() {
             keywords: undefined,
             worksId: id,
             title: res.data?.title,
-            createBy: res.data?.createBy
+            createName: res.data?.createName
         })
     }
 
@@ -65,7 +65,7 @@ export default function ApplyForPromotion() {
                             keywords: undefined,
                             workId: id,
                             title: promationDetails?.title,
-                            createBy: promationDetails?.createBy
+                            createName: promationDetails?.createName
                         }}
                     >
                         <Form.Item
@@ -81,7 +81,7 @@ export default function ApplyForPromotion() {
                         <Form.Item name='title' label='合集名称' rules={[{required: true}]}>
                             <Input disabled placeholder='请输入' />
                         </Form.Item>
-                        <Form.Item name='createBy' label='作者' rules={[{required: true}]}>
+                        <Form.Item name='createName' label='作者' rules={[{required: true}]}>
                             <Input disabled placeholder='请输入' />
                         </Form.Item>
                     </Form>

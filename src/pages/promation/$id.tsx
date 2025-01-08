@@ -75,7 +75,7 @@ export default function TaskDetail() {
             <NavBarBack content={name as string} style={{ maxWidth: '450px', background: '#f8f8fb', position: 'fixed', top: '0', width: '100%', zIndex: '99' }} />
             <div style={{ padding: '6px 6px' }} className='promationDetail'>
                 <div style={{ display: 'flex' }}>
-                    <Image src={promationDetails?.coverImg} width={200} fit='contain' />
+                    <Image src={promationDetails?.coverImg} width={730} fit='contain' />
                     <div style={{ display: 'flex', flexFlow: 'column', marginLeft: '10px'}}>
                         <span style={{fontSize: '14px', fontWeight: '800'}}>{promationDetails?.title}</span>
                         <div>

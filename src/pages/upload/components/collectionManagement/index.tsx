@@ -135,6 +135,13 @@ export default function CollectionManagement() {
                 : PromotionEnum.end,
             info: item.info
         };
+        if (item?.enablePromotion && !item.promotionUrl) {
+            Toast.show({
+                icon: "fail",
+                content: "推广失败，请输入推广链接",
+            })
+            return;
+        }
         const res = await request("/newApi/works/update", {
             method: "POST",
             body: data,
@@ -181,8 +188,16 @@ export default function CollectionManagement() {
                                 bold: true,
                                 danger: true,
                                 onClick: async () => {
-                                    await isPromotion(item.id, PromotionEnum.start);
-                                    await reload();
+                                    console.log(item)
+                                    if (item?.promotionUrl) {
+                                        await isPromotion(item.id, PromotionEnum.start);
+                                        await reload();
+                                    } else {
+                                        Toast.show({
+                                            icon: "fail",
+                                            content: "推广失败，请输入推广链接",
+                                        })
+                                    }
                                 },
                             },
                         ],
@@ -249,6 +264,13 @@ export default function CollectionManagement() {
 
     const handleAdd = async () => {
         const formValue = form.getFieldsValue();
+        if (formValue?.enablePromotion && !formValue.promotionUrl) {
+            Toast.show({
+                icon: "fail",
+                content: "请输入推广链接",
+            })
+            return;
+        }
         const coverImg = await startUpload();
         const addStatus = await addCollection({ ...formValue, coverImg: coverImg?.url ?? '' });
         setVisible(!addStatus);
