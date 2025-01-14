@@ -15,6 +15,7 @@ import {
 import "./index.less";
 import { Crop, ReactCrop } from 'react-image-crop' // 添加引入
 import 'react-image-crop/dist/ReactCrop.css'  // 添加引入
+import { imgCompress } from "@/utils";
 
 export default function CollectionManagement() {
     const [data, setData] = useState<any[]>([]);
@@ -329,7 +330,8 @@ export default function CollectionManagement() {
     }
 
     const upload = async (file: File): Promise<ImageUploadItem> => {
-        setImgFile(file)
+        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
+        setImgFile(compressFile)
         return {
             url: URL.createObjectURL(file),
         };
