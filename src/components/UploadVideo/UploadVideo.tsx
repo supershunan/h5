@@ -153,11 +153,11 @@ export default function UploadVideo() {
     const addVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
         let coverImg = values.coverImg[0]?.url
         let playUrl = values.playUrl
-        if (coverImg.includes('blob')) {
+        if (isBlobUrl(coverImg)) {
             coverImg = await startUploadImg()
             form.setFieldValue('coverImg', [{ url: coverImg }])
         }
-        if (playUrl.includes('blob')) {
+        if (isBlobUrl(playUrl)) {
             playUrl = await startUploadVideo()
             form.setFieldValue('playUrl', playUrl)
         }
@@ -183,14 +183,22 @@ export default function UploadVideo() {
         };
     };
 
+    const isBlobUrl = (url: string): boolean => {
+        try {
+            return url.startsWith('blob:');
+        } catch (e) {
+            return false;
+        }
+    }
+
     const updateVideo = async (values: any): Promise<{ status: boolean; data: any }> => {
         let coverImg = values.coverImg[0]?.url
         let playUrl = values.playUrl
-        if (coverImg.includes('blob')) {
+        if (isBlobUrl(coverImg)) {
             coverImg = await startUploadImg()
             form.setFieldValue('coverImg', [{ url: coverImg }])
         }
-        if (playUrl.includes('blob')) {
+        if (isBlobUrl(playUrl)) {
             playUrl = await startUploadVideo()
             form.setFieldValue('playUrl', playUrl)
         }
@@ -340,7 +348,7 @@ export default function UploadVideo() {
                 '-crf', '33',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
                 '-preset', 'veryfast',                 // 编码速度预设
                 '-profile:v', 'baseline',              // H.264 配置
-                '-vf', 'scale=1920:1080',              // 固定分辨率为1920x1080
+                '-vf', 'scale=-1:1080',              // 固定分辨率为1920x1080
                 '-r', '25',                            // 帧率
                 '-b:v', '718k',                       // 视频比特率(总比特率1364k - 音频比特率64k)
                 '-maxrate', '3072k',                   // 最大视频码率
