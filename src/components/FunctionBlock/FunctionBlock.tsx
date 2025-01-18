@@ -8,8 +8,8 @@ import { FunctionBlockProps, JumpTypeEnum, BlockContent } from './type';
 export default function FunctionBlock(props: FunctionBlockProps) {
     const { blockContent, style } = props;
     const copyURl = [
-        'https://czz.qfydkj.cn/',
-        'https://dr.qfydkj.cn/'
+        'https://czz.qfydkj.cn',
+        'https://dr.qfydkj.cn'
     ]
     const handleClick = (type: string, content: string) => {
         if (type === JumpTypeEnum['router']) {
