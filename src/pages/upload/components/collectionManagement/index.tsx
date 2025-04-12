@@ -480,7 +480,10 @@ export default function CollectionManagement() {
                                     maxCount={1}
                                 />
                             </Form.Item>
-                            <Form.Item name="promotionUrl" label="推广">
+                            <Form.Item name="promotionUrl" label={<div>
+                                <span>推广</span>
+                                (<span style={{color: '#ff3141'}}>网盘地址</span>)
+                            </div>}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
                             <Form.Item name="enablePromotion" label="是否推广" rules={[
