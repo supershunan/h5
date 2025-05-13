@@ -119,13 +119,13 @@ export default defineConfig({
   },
   proxy: {
     '/apiFile': {
-      target: 'https://qingfeng.qfydkj.cn/',
+      target: 'https://kzt.ciyuansj.com/',
       changeOrigin: true,
     },
-    // '/newApi': {
-    //   target: 'https://qingfeng.qfydkj.cn/',
-    //   changeOrigin: true
-    // }
+    '/newApi': {
+      target: 'https://kzt.ciyuansj.com/',
+      changeOrigin: true
+    }
   },
   esbuildMinifyIIFE: true,
   npmClient: 'pnpm',

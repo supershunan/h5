@@ -11,6 +11,7 @@ import request from '@/utils/request/request';
 import { RequstStatusEnum } from '@/utils/request/request.type';
 import { md5 } from 'js-md5';
 import Captcha, { CaptchaRef } from '@/components/Captcha/Captcha';
+import IphoneCaptcha, { IphoneCaptchaRef } from '@/components/Captcha/IphoneCaptcha'
 
 const COUNT_TIME = 60 * 5;
 export default function Login() {
@@ -41,6 +42,7 @@ export default function Login() {
     const currenHost = useRef(location.host);
     const captchaRef = useRef<CaptchaRef>(null);
     const [pwErrorNum, setPwErrorNum] = useState(0)
+    const iphoneCaptchaRef = useRef<IphoneCaptchaRef>(null);
 
 
     const register = async (values: any): Promise<boolean> => {
@@ -58,9 +60,11 @@ export default function Login() {
         return res.code === RequstStatusEnum.success;
     }
 
-    const sendSms = async (mobile: number) => {
+    const sendSms = async (mobile: number, code: number) => {
         const data = {
-            mobile
+            mobile,
+            code,
+            uuid: iphoneCaptchaRef.current?.getUuid()
         }
         const res = await request('/newApi/auth/sendSms', {
             method: 'POST',
@@ -68,6 +72,10 @@ export default function Login() {
             body: data
         })
         Toast.show(res.msg)
+        // if (res.msg === "验证码错误") {
+        //     return false
+        // }
+        // return true
     }
 
     const pwLogin = async (values: any): Promise<boolean> => {
@@ -103,38 +111,45 @@ export default function Login() {
     }
 
     const sendCode = async () => {
-        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue(); 4
-        if (!values.account) {
-            Toast.show('请输入手机号');
+        const values: PhoneLogin | Registor | PwLogin = form.getFieldsValue();
+        if (!values.account || !values.code) {
+            Toast.show('请输入手机号或图形验证码');
             return;
         }
         if (countTime < COUNT_TIME) {
             Toast.show('禁止频繁获取验证码')
             return;
         }
-        await sendSms(values?.account as number);
-        setShowTime(true);
-        const baseTime = countTime;
-        let count = 1;
-        timeInterval.current = setInterval(() => {
-            const time = baseTime - count;
-            if (time === -1) {
-                // 需要清除上一次的倒计时
-                clearInterval(timeInterval.current);
-            } else {
-                if (time === 0) {
-                    setCountTime(COUNT_TIME);
-                    setShowTime(false);
-                } else {
-                    setCountTime(time);
-                }
-            }
-            count++;
-        }, 1000);
+        await sendSms(values?.account as number, values.code as number);
+        // if (!isSend) {
+        //     return
+        // }
+        // setShowTime(true);
+        // const baseTime = countTime;
+        // let count = 1;
+        // timeInterval.current = setInterval(() => {
+        //     const time = baseTime - count;
+        //     if (time === -1) {
+        //         // 需要清除上一次的倒计时
+        //         clearInterval(timeInterval.current);
+        //     } else {
+        //         if (time === 0) {
+        //             setCountTime(COUNT_TIME);
+        //             setShowTime(false);
+        //         } else {
+        //             setCountTime(time);
+        //         }
+        //     }
+        //     count++;
+        // }, 1000);
     }
 
     const handleGo = (key: number) => {
         setCurrentStatus(key);
+        form.resetFields()
+        clearInterval(timeInterval.current);
+        setCountTime(COUNT_TIME);
+        setShowTime(false);
     }
 
     const handleLoginOrRegidter = async () => {
@@ -290,6 +305,21 @@ export default function Login() {
                             />
                         </Form.Item>
                     }
+                     {
+                        currentStatus !==  StatusEnum.pwLogin &&
+                        <Form.Item
+                            label='图形验证码'
+                            name='code'
+                            extra={
+                                <IphoneCaptcha ref={iphoneCaptchaRef} />
+                            }
+                            rules={[
+                                { required: true },
+                            ]}
+                        >
+                            <Input placeholder='请输入' clearable />
+                        </Form.Item>
+                    }
                     {
                         currentStatus !== StatusEnum.pwLogin &&
                         <Form.Item
@@ -297,7 +327,7 @@ export default function Login() {
                             name='smsCode'
                             extra={
                                 <div className='extraPart' onClick={sendCode}>
-                                    <a>{showTime && countTime}发送验证码</a>
+                                    <a>发送验证码</a>
                                 </div>
                             }
                             rules={[
