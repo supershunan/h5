@@ -66,8 +66,8 @@ export default function Setting() {
     }
 
     function beforeUpload(file: File) {
-        if (file.size > 2 * 1024 * 1024) {
-            Toast.show('请选择小于 2M 的图片')
+        if (file.size > 5 * 1024 * 1024) {
+            Toast.show('请选择小于 5M 的图片')
             return null
         }
         // 读取文件并显示裁剪界面

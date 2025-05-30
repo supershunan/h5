@@ -150,7 +150,7 @@ export default function CollectionManagement() {
 
         const status = res.code === RequstStatusEnum.success;
         Toast.show({
-            content: status ? "更新成功" : res?.msg??"更新失败",
+            content: status ? "更新成功" : res?.msg ?? "更新失败",
         });
         setVisible(!status);
         reload();
@@ -305,8 +305,8 @@ export default function CollectionManagement() {
     }
 
     const beforeUpload = (file: File, files: File[]) => {
-        if (file.size > 2 * 1024 * 1024) {
-            Toast.show('请选择小于 2M 的图片')
+        if (file.size > 5 * 1024 * 1024) {
+            Toast.show('请选择小于 5M 的图片')
             return null
         }
         return new Promise((resolve) => {
@@ -482,7 +482,7 @@ export default function CollectionManagement() {
                             </Form.Item>
                             <Form.Item name="promotionUrl" label={<div>
                                 <span>推广</span>
-                                (<span style={{color: '#ff3141'}}>网盘地址</span>)
+                                (<span style={{ color: '#ff3141' }}>网盘地址</span>)
                             </div>}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
@@ -524,6 +524,6 @@ export default function CollectionManagement() {
                 </div>
             )}
         </div>
-        
+
     );
 }

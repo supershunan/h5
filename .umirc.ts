@@ -3,130 +3,130 @@ import { defineConfig } from "umi";
 export default defineConfig({
   routes: [
     {
-      path: '/login',
-      component: '@/pages/login/index',
-      layout: false
+      path: "/login",
+      component: "@/pages/login/index",
+      layout: false,
     },
     {
-      path: '/',
-      redirect: '/home',
-      wrappers: ['@/wrappers/auth'],
+      path: "/",
+      redirect: "/home",
+      wrappers: ["@/wrappers/auth"],
     },
     {
-      path: '/home',
-      component: '@/pages/home/index',
-      wrappers: ['@/wrappers/auth'],
+      path: "/home",
+      component: "@/pages/home/index",
+      wrappers: ["@/wrappers/auth"],
     },
     {
-      path: '/historyNotice',
-      component: '@/pages/home/components/historyNotice/index',
+      path: "/historyNotice",
+      component: "@/pages/home/components/historyNotice/index",
     },
     {
-      path: '/feedback',
-      component: '@/pages/home/components/feedback/index',
+      path: "/feedback",
+      component: "@/pages/home/components/feedback/index",
     },
     {
-      path: '/appdownload',
-      component: '@/pages/home/components/appDownload/index',
+      path: "/appdownload",
+      component: "@/pages/home/components/appDownload/index",
     },
     {
-      path: '/upload',
-      component: '@/pages/upload/index',
+      path: "/upload",
+      component: "@/pages/upload/index",
     },
     {
-      path: '/uploadVideo',
-      component: '@/pages/upload/components/uploadVideo/index',
+      path: "/uploadVideo",
+      component: "@/pages/upload/components/uploadVideo/index",
     },
     {
-      path: '/collectionManagement',
-      component: '@/pages/upload/components/collectionManagement/index',
+      path: "/collectionManagement",
+      component: "@/pages/upload/components/collectionManagement/index",
     },
     {
-      path: '/collectionManagement/:id',
-      component: '@/pages/upload/components/collectionManagement/$id.tsx',
+      path: "/collectionManagement/:id",
+      component: "@/pages/upload/components/collectionManagement/$id.tsx",
     },
     {
-      path: '/videoManagement',
-      component: '@/pages/upload/components/videoManagement/index.tsx',
+      path: "/videoManagement",
+      component: "@/pages/upload/components/videoManagement/index.tsx",
     },
     {
-      path: '/promation',
-      component: '@/pages/promation/index',
+      path: "/promation",
+      component: "@/pages/promation/index",
     },
     {
-      path: '/promation/:id',
-      component: '@/pages/promation/$id.tsx',
+      path: "/promation/:id",
+      component: "@/pages/promation/$id.tsx",
     },
     {
-      path: '/applyForPromotion/:id',
-      component: '@/pages/promation/components/$id.tsx',
+      path: "/applyForPromotion/:id",
+      component: "@/pages/promation/components/$id.tsx",
     },
     {
-      path: '/my',
-      component: '@/pages/my/index',
+      path: "/my",
+      component: "@/pages/my/index",
     },
     {
-      path: '/historyIncome',
-      component: '@/pages/my/pages/historyIncome/index.tsx',
+      path: "/historyIncome",
+      component: "@/pages/my/pages/historyIncome/index.tsx",
     },
     {
-      path: '/toolbox',
-      component: '@/pages/my/pages/toolbox/index.tsx',
+      path: "/toolbox",
+      component: "@/pages/my/pages/toolbox/index.tsx",
     },
     {
-      path: '/cooperation',
-      component: '@/pages/my/pages/cooperation/index.tsx',
+      path: "/cooperation",
+      component: "@/pages/my/pages/cooperation/index.tsx",
     },
     {
-      path: '/myWords',
-      component: '@/pages/my/pages/myWords/index.tsx',
+      path: "/myWords",
+      component: "@/pages/my/pages/myWords/index.tsx",
     },
     {
-      path: '/userAgreement',
-      component: '@/pages/my/pages/userAgreement/index.tsx',
+      path: "/userAgreement",
+      component: "@/pages/my/pages/userAgreement/index.tsx",
     },
     {
-      path: '/userInfo',
-      component: '@/pages/my/pages/userInfo/index.tsx',
+      path: "/userInfo",
+      component: "@/pages/my/pages/userInfo/index.tsx",
     },
     {
-      path: '/setting',
-      component: '@/pages/my/pages/setting/index.tsx',
+      path: "/setting",
+      component: "@/pages/my/pages/setting/index.tsx",
     },
     {
-      path: '/withdrawal',
-      component: '@/pages/my/pages/withdrawal/index.tsx',
+      path: "/withdrawal",
+      component: "@/pages/my/pages/withdrawal/index.tsx",
     },
     {
-      path: '/teamBenefits',
-      component: '@/pages/my/pages/teamBenefits/index.tsx',
+      path: "/teamBenefits",
+      component: "@/pages/my/pages/teamBenefits/index.tsx",
     },
     {
-      path: '/privacyPolicy',
-      component: '@/pages/my/pages/privacyPolicy/index',
+      path: "/privacyPolicy",
+      component: "@/pages/my/pages/privacyPolicy/index",
     },
     {
-      path: '/userAgreement',
-      component: '@/pages/my/pages/userAgreement/index',
+      path: "/userAgreement",
+      component: "@/pages/my/pages/userAgreement/index",
     },
-    { path: '/*', component: '@/pages/404', layout: false },
+    { path: "/*", component: "@/pages/404", layout: false },
   ],
   chainWebpack: (memo) => {
-    memo.devServer.set('headers', {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+    memo.devServer.set("headers", {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp",
     });
   },
   proxy: {
-    '/apiFile': {
-      target: 'https://kzt.ciyuansj.com/',
+    "/apiFile": {
+      target: "https://kzt.lddian.com/",
       changeOrigin: true,
     },
-    '/newApi': {
-      target: 'https://kzt.ciyuansj.com/',
-      changeOrigin: true
-    }
+    "/newApi": {
+      target: "https://kzt.lddian.com/",
+      changeOrigin: true,
+    },
   },
   esbuildMinifyIIFE: true,
-  npmClient: 'pnpm',
+  npmClient: "pnpm",
 });

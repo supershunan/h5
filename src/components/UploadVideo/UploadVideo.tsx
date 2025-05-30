@@ -229,8 +229,8 @@ export default function UploadVideo() {
     }
 
     async function beforeUpload(file: File): Promise<File | null> {
-        if (file.size > 2 * 1024 * 1024) {
-            Toast.show('请选择小于 2M 的图片')
+        if (file.size > 5 * 1024 * 1024) {
+            Toast.show('请选择小于 5M 的图片')
             return null
         }
 
@@ -345,19 +345,19 @@ export default function UploadVideo() {
 
                 // 视频编码设置
                 '-c:v', 'libx264',                     // 使用 H.264 编码器
-                '-crf', '33',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
+                '-crf', '28',                          // 压缩质量(0-51): 0=无损,23=默认,28=压缩率高,51=最差
                 '-preset', 'veryfast',                 // 编码速度预设
                 '-profile:v', 'baseline',              // H.264 配置
                 '-vf', 'scale=-1:1080',              // 固定分辨率为1920x1080
                 '-r', '25',                            // 帧率
-                '-b:v', '718k',                       // 视频比特率(总比特率1364k - 音频比特率64k)
-                '-maxrate', '3072k',                   // 最大视频码率
-                '-bufsize', '102400k',                 // 编码器缓冲区大小
+                '-b:v', '128k',                       // 视频比特率(总比特率1364k - 音频比特率64k)
+                '-maxrate', '2048k',                   // 最大视频码率
+                '-bufsize', '409600k',                 // 编码器缓冲区大小
                 '-movflags', '+faststart',             // 优化网络播放
 
                 // 音频编码设置
                 '-c:a', 'aac',                         // 音频编码器
-                '-b:a', '64k',                         // 固定音频码率为64k
+                '-b:a', '62k',                         // 固定音频码率为64k
                 '-ar', '22050',                        // 音频采样率
                 '-ac', '1',                            // 声道数
                 '-af', 'volume=1.0',                   // 音频滤镜
@@ -515,7 +515,7 @@ export default function UploadVideo() {
                 onFinish={onFinish}
                 initialValues={videoDetail}
                 footer={
-                    <Button block type="submit" color="primary" size="large"  disabled={type === UploadType.add ? !compressComplete : false}>
+                    <Button block type="submit" color="primary" size="large" disabled={type === UploadType.add ? !compressComplete : false}>
                         提交
                     </Button>
                 }
