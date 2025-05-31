@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { history, useLocation } from 'umi';
 import { Modal, Card, Button, Toast } from 'antd-mobile';
 import { BankcardOutline, UserSetOutline, DownlandOutline, FileOutline } from 'antd-mobile-icons';
@@ -7,18 +7,20 @@ import { FunctionBlockProps, JumpTypeEnum, BlockContent } from './type';
 
 export default function FunctionBlock(props: FunctionBlockProps) {
     const { blockContent, style } = props;
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [imageContent, setImageContent] = useState('');
+    
     const copyURl = [
         'https://czz.qfydkj.cn',
         'https://dr.qfydkj.cn'
     ]
+    
     const handleClick = (type: string, content: string) => {
         if (type === JumpTypeEnum['router']) {
             history.push(content)
         } else if (type === JumpTypeEnum['modal']) {
-            Modal.show({
-                image: content,
-                closeOnMaskClick: true,
-            })
+            setImageContent(content);
+            setShowImageModal(true);
         } else if (type === JumpTypeEnum['copy']) {
             Modal.show({
                title: '请复制到浏览器打开',
@@ -47,6 +49,12 @@ export default function FunctionBlock(props: FunctionBlockProps) {
             })
         }
     }
+
+    const handleCloseImageModal = () => {
+        setShowImageModal(false);
+        setImageContent('');
+    }
+
     const handleCopy = (text: string) => {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             return navigator.clipboard.writeText(text)
@@ -94,6 +102,37 @@ export default function FunctionBlock(props: FunctionBlockProps) {
                     }
                 </div>
             </Card>
+            
+            {/* 自定义图片模态框 */}
+            {showImageModal && (
+                <div 
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1000
+                    }}
+                    onClick={handleCloseImageModal}
+                >
+                    <img 
+                        src={imageContent}
+                        alt="预览图片"
+                        style={{
+                            width: '200px',
+                            height: '200px',
+                            objectFit: 'contain',
+                            borderRadius: '8px'
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
         </div>
     )
 }
