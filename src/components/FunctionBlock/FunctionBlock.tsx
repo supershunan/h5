@@ -11,8 +11,8 @@ export default function FunctionBlock(props: FunctionBlockProps) {
     const [imageContent, setImageContent] = useState('');
     
     const copyURl = [
-        'https://czz.qfydkj.cn',
-        'https://dr.qfydkj.cn'
+        'https://creator.lddian.com',
+        'https://pro.lddian.com'
     ]
     
     const handleClick = (type: string, content: string) => {

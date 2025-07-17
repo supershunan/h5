@@ -4,7 +4,7 @@ import { Form, Input, Divider, Button, Toast, Image } from 'antd-mobile';
 import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
 import { StatusEnum, PhoneLogin, Registor, PwLogin, LoginTypeEnum } from './index.type';
 import LoginBgCZZ from './../../assets/images/创作者中心.png';
-import LoginBgDR from './../../assets/images/达人中心.png';
+import LoginBgDR from './../../assets/images/推广员中心.png';
 import './index.less';
 import '@/pages/global.less';
 import request from '@/utils/request/request';
@@ -233,7 +233,7 @@ export default function Login() {
     return (
         <div className='login'>
             <div className="login-content">
-                <img src={currenHost.current === 'dr.qfydkj.cn' ? LoginBgDR : LoginBgCZZ} width={'100%'} />
+                <img src={currenHost.current === 'pro.lddian.com' ? LoginBgDR : LoginBgCZZ} width={'100%'} />
                 <Form form={form} layout='horizontal' style={{ padding: '0 20px' }}>
                     <Form.Item
                         label='手机号'

@@ -579,7 +579,7 @@ export default function UploadVideo() {
                             <div>
                                 价格
                                 <span style={{ color: "#1677ff", fontSize: "10px" }}>
-                                    100次元币=1元
+                                    100灵动币=1元
                                 </span>
                             </div>
                         }
@@ -587,7 +587,7 @@ export default function UploadVideo() {
                             <div
                                 style={{ position: "relative", top: "15px", fontSize: "13px" }}
                             >
-                                次元币
+                                灵动币
                             </div>
                         }
                         initialValue={0}

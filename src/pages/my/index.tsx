@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Avatar, Button, Card, Divider, Image, Space } from 'antd-mobile'
-import BgImg from '@/assets/images/welcome.jpg'
+import BgImg from '@/assets/images/welcome.png'
 import FunctionBlock from '@/components/FunctionBlock/FunctionBlock';
 import { JumpTypeEnum } from '@/components/FunctionBlock/type';
 import { AppstoreOutline, GlobalOutline, SetOutline, PayCircleOutline, LinkOutline, ReceiptOutline, RightOutline, ContentOutline } from 'antd-mobile-icons';
@@ -86,7 +86,7 @@ export default function Me() {
             <div className="bg">
                 <Image src={BgImg} fit='fill' />
             </div>
-            <div style={{ position: 'relative', top: '-50px', padding: '0 6px' }}>
+            <div style={{ position: 'relative', top: '-40px', padding: '0 6px' }}>
                 <Card>
                     <div className="userInfo">
                         <div style={{ display: 'flex', alignItems: 'center'}}>
