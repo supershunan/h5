@@ -30,7 +30,7 @@ export default function (props) {
       key: '/upload',
       title: '上传',
       icon: <AddCircleOutline />,
-      hidden: window.location.host === 'dr.qfydkj.cn',
+      hidden: window.location.host === 'pro.lddian.com',
     },
     {
       key: '/promation', 
