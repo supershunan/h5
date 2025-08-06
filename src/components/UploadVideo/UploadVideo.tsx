@@ -14,7 +14,7 @@ import "./index.less";
 import request from "@/utils/request/request";
 import { RequstStatusEnum } from "@/utils/request/request.type";
 import { AuditStatusEnum } from "@/utils/type/global.type";
-import { imgCompress } from "@/utils";
+import { AliOSSUpload, getOSSCredentials, imgCompress, isCredentialsExpired, SingleAliOSSUpload } from "@/utils";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
 import { toBlobURL } from '@ffmpeg/util';
@@ -59,6 +59,7 @@ export default function UploadVideo() {
     const [cropSrc, setCropSrc] = useState<string>();
     const [showCrop, setShowCrop] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
+    let [aliOSSUploader, setAliOSSUploader] = useState<AliOSSUpload>()
 
     useEffect(() => {
         const loadFFmpeg = async () => {
@@ -75,6 +76,16 @@ export default function UploadVideo() {
         };
 
         loadFFmpeg();
+
+        const updateOSSCredentials = async () => {
+            let oSSCredentials = JSON.parse(window.localStorage.getItem('OSSCredentials') as string)
+            if (isCredentialsExpired(oSSCredentials)) {
+                oSSCredentials = await getOSSCredentials()
+            }
+            const loader = SingleAliOSSUpload.getInstance(oSSCredentials.accessKeyId, oSSCredentials.accessKeySecret, oSSCredentials.securityToken, oSSCredentials.expiration)
+            setAliOSSUploader(loader)
+        }
+        updateOSSCredentials()
     }, []);
 
     useEffect(() => {
@@ -320,10 +331,14 @@ export default function UploadVideo() {
             });
             return Promise.reject('视频大小不能超过1G');
         }
+        console.log(aliOSSUploader)
+        const { accessKeyId, accessKeySecret, securityToken } = JSON.parse(window.localStorage.getItem('OSSCredentials') as string)
+        aliOSSUploader?.uploader.addFile(file, null, null, null, '{"Vod":{}}')
+        console.log(aliOSSUploader?.uploader)
         console.log('pre ', file)
-        const compressedFile = await videoCompress(file);
+        // const compressedFile = await videoCompress(file);
         // 压缩视频
-        // const compressedFile = file;
+        const compressedFile = file;
         console.log('after', compressedFile)
         setVideoFile(compressedFile);
 
@@ -331,6 +346,11 @@ export default function UploadVideo() {
             url: URL.createObjectURL(compressedFile),
         };
     };
+
+    const start = () => {
+        console.log('wll', aliOSSUploader?.uploader)
+        aliOSSUploader?.uploader.startUpload()
+    }
 
     const videoCompress = async (file: File): Promise<File> => {
         try {
@@ -466,7 +486,7 @@ export default function UploadVideo() {
                 value={fileVideo}
             />
         );
-    }, [fileVideo]);
+    }, [fileVideo, aliOSSUploader]);
 
     const handleCropComplete = async () => {
         if (!imgRef.current || !crop) return
@@ -696,6 +716,7 @@ export default function UploadVideo() {
                     </div>
                 </div>
             )}
+            <button onClick={start}>开始</button>
         </div>
     );
 }

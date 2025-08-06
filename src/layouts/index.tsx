@@ -17,6 +17,9 @@ import {
   TravelOutline,
   UserOutline,
 } from 'antd-mobile-icons';
+import OSS from '../assets/aliyun-upload-sdk-1.5.6/lib/aliyun-oss-sdk-6.17.1.min.js'
+window.OSS = OSS;
+import '../assets/aliyun-upload-sdk-1.5.6/aliyun-upload-sdk-1.5.7.min.js'
 
 export default function (props) {
   const tabs = [
