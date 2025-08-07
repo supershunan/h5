@@ -89,6 +89,18 @@ export default function UploadVideo() {
     }, []);
 
     useEffect(() => {
+        if (aliOSSUploader) {
+            aliOSSUploader.onProgressChange = (progress: number) => {
+                setUploadProgress(progress);
+            };
+        }
+    }, [aliOSSUploader]);
+
+    useEffect(() => {
+        console.log('上传进度变化:', uploadProgress + '%');
+    }, [uploadProgress]);
+
+    useEffect(() => {
         videoClass();
         collectionClass();
     }, []);
@@ -169,8 +181,15 @@ export default function UploadVideo() {
             form.setFieldValue('coverImg', [{ url: coverImg }])
         }
         if (isBlobUrl(playUrl)) {
-            playUrl = await startUploadVideo()
-            form.setFieldValue('playUrl', playUrl)
+            try {
+                playUrl = await startUploadVideo() // 等待上传完成
+                form.setFieldValue('playUrl', playUrl)
+            } catch (error) {
+                console.error('视频上传失败:', error);
+                Toast.show('视频上传失败');
+                setVisible(false);
+                return { status: false, data: '视频上传失败' };
+            }
         }
         const data = {
             title: values.title, //标题
@@ -210,8 +229,15 @@ export default function UploadVideo() {
             form.setFieldValue('coverImg', [{ url: coverImg }])
         }
         if (isBlobUrl(playUrl)) {
-            playUrl = await startUploadVideo()
-            form.setFieldValue('playUrl', playUrl)
+            try {
+                playUrl = await startUploadVideo() // 等待上传完成
+                form.setFieldValue('playUrl', playUrl)
+            } catch (error) {
+                console.error('视频上传失败:', error);
+                Toast.show('视频上传失败');
+                setVisible(false);
+                return { status: false, data: '视频上传失败' };
+            }
         }
         const data = {
             id: videoDetail?.id,
@@ -283,36 +309,27 @@ export default function UploadVideo() {
 
     const startUploadVideo = async () => {
         if (!videoFile) return null
-        const formdata = new FormData();
-        formdata.append("file", videoFile);
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/apiFile/file/upload", true);
-        xhr.setRequestHeader("Authorization", localStorage.getItem("Token") as string);
-
+        
         return new Promise((resolve, reject) => {
-            xhr.upload.onprogress = (event) => {
-                if (event.lengthComputable) {
-                    const progress = Math.round((event.loaded / event.total) * 100);
-                    setUploadProgress(progress)
-                    console.log(`上传进度: ${progress}%`);
-                }
+            if (!aliOSSUploader) {
+                reject(new Error('上传器未初始化'));
+                return;
+            }
+
+            // 设置上传成功回调
+            aliOSSUploader.onUploadSuccess = (uploadInfo: any) => {
+                console.log('uploadInfo', uploadInfo);
+                resolve(uploadInfo.object);
             };
 
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    const data = JSON.parse(xhr.responseText);
-                    resolve(data.data);
-                } else {
-                    reject(new Error('上传失败'));
-                }
+            // 设置上传失败回调
+            aliOSSUploader.onUploadFailed = (uploadInfo: any, code: any, message: any) => {
+                console.log('上传失败:', message);
+                reject(new Error(message || '上传失败'));
             };
 
-            xhr.onerror = () => {
-                reject(new Error('上传失败'));
-            };
-
-            xhr.send(formdata);
+            // 开始上传
+            aliOSSUploader.uploader.startUpload();
         });
     }
 
@@ -331,16 +348,13 @@ export default function UploadVideo() {
             });
             return Promise.reject('视频大小不能超过1G');
         }
-        console.log(aliOSSUploader)
-        const { accessKeyId, accessKeySecret, securityToken } = JSON.parse(window.localStorage.getItem('OSSCredentials') as string)
-        aliOSSUploader?.uploader.addFile(file, null, null, null, '{"Vod":{}}')
-        console.log(aliOSSUploader?.uploader)
         console.log('pre ', file)
-        // const compressedFile = await videoCompress(file);
+        const compressedFile = await videoCompress(file);
         // 压缩视频
-        const compressedFile = file;
+        // const compressedFile = file;
         console.log('after', compressedFile)
         setVideoFile(compressedFile);
+        aliOSSUploader?.uploader.addFile(compressedFile, null, null, null, '{"Vod":{}}')
 
         return {
             url: URL.createObjectURL(compressedFile),
@@ -348,7 +362,6 @@ export default function UploadVideo() {
     };
 
     const start = () => {
-        console.log('wll', aliOSSUploader?.uploader)
         aliOSSUploader?.uploader.startUpload()
     }
 

@@ -82,15 +82,21 @@ export function isCredentialsExpired(credentials: {
 }
 
 export class AliOSSUpload {
-    public uploader;
+    public uploader: AliyunUpload.Vod;
     public statusText: string;
+    public progressPercent: number;
+    public onProgressChange?: (progress: number) => void;
+    public onUploadSuccess?: (uploadInfo: any) => void;
+    public onUploadFailed?: (uploadInfo: any, code: any, message: any) => void;
 
     constructor() {
         this.uploader = null;
         this.statusText = '';
+        this.progressPercent = 0;
     }
 
     init(accessKeyId: string, accessKeySecret: string, secretToken: string, expiration: string) {
+        const self = this;
         this.uploader = new AliyunUpload.Vod({
           timeout: 60000,
           partSize: Math.round(1048576),
@@ -99,7 +105,7 @@ export class AliOSSUpload {
           retryDuration: 2,
           region: 'cn-beijing',
           userId: 'ldd',
-          localCheckpoint: true, //此参数是禁用服务端缓存
+          // localCheckpoint: true, //此参数是禁用服务端缓存
           // 添加文件成功
           addFileSuccess: function (uploadInfo: any) {
             console.log("addFileSuccess: " + uploadInfo.file.name)
@@ -107,29 +113,40 @@ export class AliOSSUpload {
           // 开始上传
           onUploadstarted: (uploadInfo: any) => {
             this.uploader.setSTSToken(uploadInfo, accessKeyId, accessKeySecret, secretToken)
-            console.log("onUploadStarted:" + uploadInfo.file.name + ", endpoint:" + uploadInfo.endpoint + ", bucket:" + uploadInfo.bucket + ", object:" + uploadInfo.object)
+            console.log("onUploadStarted:", uploadInfo)
           },
           // 文件上传成功
           onUploadSucceed: function (uploadInfo: any) {
-            console.log("onUploadSucceed: " + uploadInfo.file.name + ", endpoint:" + uploadInfo.endpoint + ", bucket:" + uploadInfo.bucket + ", object:" + uploadInfo.object)
-            this.statusText = '文件上传成功!'
+            console.log('onUploadSucceed', uploadInfo)
+            if (self.onUploadSuccess) {
+                self.onUploadSuccess(uploadInfo);
+            }
+            self.statusText = '文件上传成功!'
           },
           // 文件上传失败
           onUploadFailed: function (uploadInfo: any, code: any, message: any) {
-            console.log("onUploadFailed: file:" + uploadInfo.file.name + ",code:" + code + ", message:" + message)
-            this.statusText = '文件上传失败!'
+            console.log("onUploadFailed: file:", uploadInfo)
+            if (self.onUploadFailed) {
+                self.onUploadFailed(uploadInfo, code, message);
+            }
+            self.statusText = '文件上传失败!'
           },
           // 取消文件上传
           onUploadCanceled: function (uploadInfo: any, code: any, message: any) {
-            console.log("Canceled file: " + uploadInfo.file.name + ", code: " + code + ", message:" + message)
-            this.statusText = '文件已暂停上传'
+            console.log("Canceled file: ", uploadInfo)
+            self.statusText = '文件已暂停上传'
           },
           // 文件上传进度，单位：字节, 可以在这个函数中拿到上传进度并显示在页面上
           onUploadProgress: function (uploadInfo: any, totalSize: any, progress: any) {
-            console.log("onUploadProgress:file:" + uploadInfo.file.name + ", fileSize:" + totalSize + ", percent:" + Math.ceil(progress * 100) + "%")
             let progressPercent = Math.ceil(progress * 100)
-            this.stsProgress = progressPercent
-            this.statusText = '文件上传中...'
+            self.progressPercent = progressPercent // 更新进度
+            self.statusText = '文件上传中...'
+            console.log('上传进度:', progressPercent + '%')
+            
+            // 触发进度变化回调
+            if (self.onProgressChange) {
+                self.onProgressChange(progressPercent);
+            }
           },
           // 上传凭证超时
           onUploadTokenExpired: function (uploadInfo: any) {
@@ -137,12 +154,12 @@ export class AliOSSUpload {
             // 上传文件过大时可能在上传过程中 sts token 就会失效, 所以需要在 token 过期的回调中调用 resumeUploadWithSTSToken 方法
             // 这里是测试接口, 所以我直接获取了 STSToken
             this.uploader.resumeUploadWithSTSToken(accessKeyId, accessKeySecret, secretToken, expiration)
-            this.statusText = '文件超时...'
+            self.statusText = '文件超时...'
           },
           // 全部文件上传结束
           onUploadEnd: function (uploadInfo: any) {
             console.log("onUploadEnd: uploaded all the files")
-            this.statusText = '文件上传完毕'
+            self.statusText = '文件上传完毕'
           }
         })
     }
@@ -155,7 +172,6 @@ export class SingleAliOSSUpload {
         if (!this.aliOSSUploaderInstance) {
             this.aliOSSUploaderInstance = new AliOSSUpload()
             this.aliOSSUploaderInstance.init(accessKeyId, accessKeySecret, secretToken, expiration)
-            console.log('进来了', this.aliOSSUploaderInstance)
         }
         return this.aliOSSUploaderInstance
     }
