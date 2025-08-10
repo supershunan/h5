@@ -45,6 +45,14 @@ export default function withdrawal() {
 
     const startWithdraw = async () => {
         const formValues = form.getFieldsValue();
+
+        if (formValues.amount < 100) {
+            Toast.show({
+                icon: 'fail',
+                content: `提现最低额度为100，当前为${formValues.amount}`,
+            })
+            return
+        }
         const data = {
             type: formValues.type?.length > 0 ? formValues?.type[0] : 'ALIPAY', //WECHART或ALIPAY 目前只支持 ALIPAY
             amount: formValues?.amount, //余额单位（元）用户信息 canWithdrawalBalance字段，可提现余额

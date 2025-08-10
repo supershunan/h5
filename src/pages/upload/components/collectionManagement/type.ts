@@ -20,6 +20,10 @@ export interface AddFolderParams {
     /** 是否开启推广  0否 1是 */
     enablePromotion: 0 | 1;
     info: string;
+    /** 总合集价格 */
+    money: number;
+    /** 分类 */
+    labelList: Array<any>;
 }
 
 export interface CollectionItem {

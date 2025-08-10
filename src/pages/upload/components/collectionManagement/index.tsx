@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem, TextArea, Mask } from "antd-mobile";
+import { Toast, Dialog, Button, Popup, Form, Input, Radio, Space, InfiniteScroll, ImageUploader, ImageUploadItem, TextArea, Mask, Picker } from "antd-mobile";
 import { history } from "umi";
 import { Action } from "antd-mobile/es/components/popover";
 import NavBarBack from "@/components/NavBarBack/NavBarBack";
@@ -48,12 +48,19 @@ export default function CollectionManagement() {
     const [cropSrc, setCropSrc] = useState<string>();
     const [showCrop, setShowCrop] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
+    const [videClassify, setVideoClassify] = useState<[][]>([]);
+    const [videoVisible, setVideoVisible] = useState(false);
+    const [videoValue, setVideoValue] = useState<(string | null)[]>(["6"]);
 
     useEffect(() => {
         if (isLoad) {
             getCollectionList();
         }
     }, [params]);
+    
+    useEffect(() => {
+        videoClass();
+    }, []);
 
     const getCollectionList = async () => {
         const res = await request("/newApi/works/pageForH5", {
@@ -92,6 +99,7 @@ export default function CollectionManagement() {
                     url: res.data.coverImg,
                 },
             ]
+            res.data.labelList = [Number(res.data.labelList[0])];
             setItemData(res.data);
             form.setFieldsValue(res.data); // 更新表单字段的值
         }
@@ -106,6 +114,8 @@ export default function CollectionManagement() {
                 ? PromotionEnum.start
                 : PromotionEnum.end,
             info: params?.info,
+            money: params.money,
+            labelList: params.labelList,
         };
         const res = await request("/newApi/works/addFolder", {
             method: "POST",
@@ -134,7 +144,9 @@ export default function CollectionManagement() {
             enablePromotion: item.enablePromotion
                 ? PromotionEnum.start
                 : PromotionEnum.end,
-            info: item.info
+            info: item.info,
+            money: item.money,
+            labelList: item.labelList,
         };
         if (item?.enablePromotion && !item.promotionUrl) {
             Toast.show({
@@ -281,6 +293,8 @@ export default function CollectionManagement() {
         if (addStatus) {
             form.resetFields();
             setItemData(undefined); // 成功创建后重置 itemData
+        }else {
+            return
         }
         reload();
     };
@@ -394,6 +408,19 @@ export default function CollectionManagement() {
         }, 'image/png')
     }
 
+    const videoClass = async () => {
+        const res = await request("/newApi/label/videoList", { method: "GET" });
+        const classify = res.data?.map(
+            (item: { name: String; code: string; id: number }) => {
+                return {
+                    label: item.name,
+                    value: item.id,
+                };
+            }
+        );
+        res.code === RequstStatusEnum.success && setVideoClassify([classify]);
+    };
+
     return (
         <div className="collectionContainer" style={{ padding: "46px 0" }}>
             <NavBarBack
@@ -485,6 +512,44 @@ export default function CollectionManagement() {
                                 (<span style={{ color: '#ff3141' }}>网盘地址</span>)
                             </div>}>
                                 <Input placeholder="请输入" />
+                            </Form.Item>
+                            <Form.Item name="money" label="总合集价格" rules={[
+                                { required: true },
+                            ]}>
+                                <Input placeholder="请输入" />
+                            </Form.Item>
+                            <Form.Item
+                                name="labelList"
+                                label="分类"
+                                trigger="onConfirm"
+                                onClick={(e) => {
+                                    setVideoVisible(true);
+                                }}
+                                rules={[{ required: true }]}
+                            >
+                                <Picker
+                                    columns={videClassify}
+                                    visible={videoVisible}
+                                    value={videoValue}
+                                    onClose={() => {
+                                        setVideoVisible(false);
+                                    }}
+                                    onConfirm={(v) => {
+                                        setVideoValue(v);
+                                    }}
+                                    onSelect={(val, extend) => {
+                                    }}
+                                >
+                                    {(items, { open }) => {
+                                        return (
+                                            <>
+                                                {items?.every((item) => item === null)
+                                                    ? "未选择"
+                                                    : items.map((item) => item?.label ?? "未选择").join(" - ")}
+                                            </>
+                                        );
+                                    }}
+                                </Picker>
                             </Form.Item>
                             <Form.Item name="enablePromotion" label="是否推广" rules={[
                                 { required: true },

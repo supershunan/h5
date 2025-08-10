@@ -60,6 +60,7 @@ export default function UploadVideo() {
     const [showCrop, setShowCrop] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
     let [aliOSSUploader, setAliOSSUploader] = useState<AliOSSUpload>()
+    const [videoId, setVideoId] = useState<string>()
 
     useEffect(() => {
         const loadFFmpeg = async () => {
@@ -75,7 +76,7 @@ export default function UploadVideo() {
             }
         };
 
-        loadFFmpeg();
+        // loadFFmpeg();
 
         const updateOSSCredentials = async () => {
             let oSSCredentials = JSON.parse(window.localStorage.getItem('OSSCredentials') as string)
@@ -153,6 +154,7 @@ export default function UploadVideo() {
                 return {
                     label: item.title,
                     value: item.id,
+                    labelList: item.labelList,
                 };
             }
         );
@@ -169,6 +171,7 @@ export default function UploadVideo() {
                     url: res.data.coverImg,
                 },
             ];
+            res.data.labelList = [Number(res.data.labelList[0])];
             res.code === RequstStatusEnum.success && setVideoDetail(res.data);
         }
     };
@@ -183,7 +186,8 @@ export default function UploadVideo() {
         if (isBlobUrl(playUrl)) {
             try {
                 playUrl = await startUploadVideo() // 等待上传完成
-                form.setFieldValue('playUrl', playUrl)
+                form.setFieldValue('playUrl', playUrl.videoId)
+                setVideoId(playUrl.videoId)
             } catch (error) {
                 console.error('视频上传失败:', error);
                 Toast.show('视频上传失败');
@@ -195,11 +199,11 @@ export default function UploadVideo() {
             title: values.title, //标题
             info: values.info, //简介
             coverImg: coverImg ? coverImg : "", //封面
-            playUrl: playUrl, //上传视频的地址
-            collNum: values.collNum, //集数
+            playUrl: playUrl.videoId ?? videoId, //上传视频的地址
+            collNum: Number(values.collNum), //集数
             pid: id ? id : values.collection[0], //合集的id
             useTime: values.useTime, //购买一次使用的时间，单位 小时
-            money: values.money, //价格
+            money: Number(values.money), //价格
             labelList: values.labelList, //分类id
         };
         const res = await request("/newApi/works/addVideo", {
@@ -231,7 +235,8 @@ export default function UploadVideo() {
         if (isBlobUrl(playUrl)) {
             try {
                 playUrl = await startUploadVideo() // 等待上传完成
-                form.setFieldValue('playUrl', playUrl)
+                form.setFieldValue('playUrl', playUrl.videoId)
+                setVideoId(playUrl.videoId)
             } catch (error) {
                 console.error('视频上传失败:', error);
                 Toast.show('视频上传失败');
@@ -244,11 +249,12 @@ export default function UploadVideo() {
             title: values.title,
             info: values.info,
             coverImg: coverImg ? coverImg : "", //封面
-            playUrl: playUrl, //上传视频的地址values.playUrl,
-            collNum: values.collNum,
+            playUrl: playUrl.videoId ?? videoId, //上传视频的地址values.playUrl,
+            collNum: Number(values.collNum),
             pid: values.collection[0],
             useTime: values.useTime,
-            money: values.money,
+            money: Number(values.money),
+            labelList: values.labelList,
         };
         const res = await request("/newApi/works/update", {
             method: "POST",
@@ -319,7 +325,7 @@ export default function UploadVideo() {
             // 设置上传成功回调
             aliOSSUploader.onUploadSuccess = (uploadInfo: any) => {
                 console.log('uploadInfo', uploadInfo);
-                resolve(uploadInfo.object);
+                resolve(uploadInfo);
             };
 
             // 设置上传失败回调
@@ -349,9 +355,9 @@ export default function UploadVideo() {
             return Promise.reject('视频大小不能超过1G');
         }
         console.log('pre ', file)
-        const compressedFile = await videoCompress(file);
+        // const compressedFile = await videoCompress(file);
         // 压缩视频
-        // const compressedFile = file;
+        const compressedFile = file;
         console.log('after', compressedFile)
         setVideoFile(compressedFile);
         aliOSSUploader?.uploader.addFile(compressedFile, null, null, null, '{"Vod":{}}')
@@ -548,7 +554,7 @@ export default function UploadVideo() {
                 onFinish={onFinish}
                 initialValues={videoDetail}
                 footer={
-                    <Button block type="submit" color="primary" size="large" disabled={type === UploadType.add ? !compressComplete : false}>
+                    <Button block type="submit" color="primary" size="large">
                         提交
                     </Button>
                 }
@@ -632,13 +638,49 @@ export default function UploadVideo() {
                     </Form.Item>
                 </div>
                 <Form.Item
+                    name="collection"
+                    label="合集选择"
+                    trigger="onConfirm"
+                    onClick={(e) => {
+                        setColllectionVideoVisible(true);
+                    }}
+                    rules={[{ required: true }]}
+                >
+                    <Picker
+                        columns={colllectionClassify}
+                        visible={colllectionVisible}
+                        value={colllectionValue}
+                        onClose={() => {
+                            setColllectionVideoVisible(false);
+                        }}
+                        onConfirm={(v) => {
+                            setColllectionValue(v);
+                            const value = colllectionClassify.find(item => item[0]?.value === v[0])?.[0]?.labelList
+                            setVideoValue(value);
+                            form.setFieldValue('labelList', value)
+                        }}
+                        onSelect={(val, extend) => {
+                        }}
+                    >
+                        {(items, { open }) => {
+                            return (
+                                <>
+                                    {items.every((item) => item === null)
+                                        ? "未选择"
+                                        : items.map((item) => item?.label ?? "未选择").join(" - ")}
+                                </>
+                            );
+                        }}
+                    </Picker>
+                </Form.Item>
+                <Form.Item
                     name="labelList"
                     label="分类"
                     trigger="onConfirm"
                     onClick={(e) => {
                         setVideoVisible(true);
                     }}
-                    rules={[{ required: true }]}
+                    disabled={true}
                 >
                     <Picker
                         columns={videClassify}
@@ -657,39 +699,6 @@ export default function UploadVideo() {
                             return (
                                 <>
                                     {items?.every((item) => item === null)
-                                        ? "未选择"
-                                        : items.map((item) => item?.label ?? "未选择").join(" - ")}
-                                </>
-                            );
-                        }}
-                    </Picker>
-                </Form.Item>
-                <Form.Item
-                    name="collection"
-                    label="合集选择"
-                    trigger="onConfirm"
-                    onClick={(e) => {
-                        setColllectionVideoVisible(true);
-                    }}
-                    rules={[{ required: true }]}
-                >
-                    <Picker
-                        columns={colllectionClassify}
-                        visible={colllectionVisible}
-                        value={colllectionValue}
-                        onClose={() => {
-                            setColllectionVideoVisible(false);
-                        }}
-                        onConfirm={(v) => {
-                            setColllectionValue(v);
-                        }}
-                        onSelect={(val, extend) => {
-                        }}
-                    >
-                        {(items, { open }) => {
-                            return (
-                                <>
-                                    {items.every((item) => item === null)
                                         ? "未选择"
                                         : items.map((item) => item?.label ?? "未选择").join(" - ")}
                                 </>
@@ -729,7 +738,6 @@ export default function UploadVideo() {
                     </div>
                 </div>
             )}
-            <button onClick={start}>开始</button>
         </div>
     );
 }
