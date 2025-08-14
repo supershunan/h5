@@ -10,9 +10,17 @@ export default async function request(
   options?: CustomRequestInit
 ): Promise<T> {
   const Token = localStorage.getItem("Token") || "";
+  const tokenTime = window.localStorage.getItem("TokenTime");
+  const currentTime = new Date().getTime();
+
+  // 检查token是否小于12小时过期
+  const isOverdue = tokenTime
+    ? currentTime - new Date(Number(tokenTime)).getTime() > 12 * 60 * 60 * 1000
+    : true;
+
   // 请求拦截
   if (!options?.skipAuth) {
-    if (!Token) {
+    if (!Token || isOverdue) {
       history.push("/login");
       Toast.show({
         icon: "fail",
@@ -20,6 +28,15 @@ export default async function request(
       });
       return Promise.reject();
     }
+  }
+  console.log(path)
+  if (isOverdue && !path.includes('loginForH5')) {
+    history.push("/login");
+      Toast.show({
+        icon: "fail",
+        content: "登录信息过期",
+      });
+      return Promise.reject();
   }
 
   // 重置 headers

@@ -305,7 +305,7 @@ export default function UploadVideo() {
         const res = await fetch("/apiFile/file/upload", {
             method: "POST",
             headers: {
-                Authorization: localStorage.getItem("Token") as string,
+                Authorization: localStorage.getItem('Token') as string,
             },
             body: formdata,
         });
@@ -360,7 +360,12 @@ export default function UploadVideo() {
         const compressedFile = file;
         console.log('after', compressedFile)
         setVideoFile(compressedFile);
-        aliOSSUploader?.uploader.addFile(compressedFile, null, null, null, '{"Vod":{}}')
+        const paramData = JSON.stringify({
+            Vod: {
+                TemplateGroupId: '18ea3c3ee4c67b23d9a79e57c2923a2f'
+            }
+        })
+        aliOSSUploader?.uploader.addFile(compressedFile, null, null, null, paramData)
 
         return {
             url: URL.createObjectURL(compressedFile),

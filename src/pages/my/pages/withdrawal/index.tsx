@@ -27,11 +27,13 @@ export default function withdrawal() {
     }, []);
 
     const allWithDrawal = () => {
-        form.setFieldsValue({
-            ...form.getFieldsValue(),
-            amount: totalIncome
-        })
-        setAllTotalIncome(totalIncome);
+        // form.setFieldsValue({
+        //     ...form.getFieldsValue(),
+        //     amount: totalIncome ?? 0
+        // })
+        // setAllTotalIncome(totalIncome);
+        console.log('wkk', totalIncome)
+        form.setFieldValue('amount', totalIncome ?? 0)
     }
 
     const getWithdrawRule = async () => {
@@ -84,16 +86,16 @@ export default function withdrawal() {
                         form={form}
                         layout='horizontal'
                     >
-                        <Form.Item name='amount' label='提现金额'>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Input placeholder='请输入' type='number' value={allTotalIncome} />
-                                <Button
-                                onClick={allWithDrawal}
-                                style={{ width: '150px', fontSize: '13px' }}>
-                                    全部提现
-                                </Button>
-                            </div>
+                        <Form.Item name='amount' label='提现金额' >
+                            <Input placeholder='请输入' type='number'/>
                         </Form.Item>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Button
+                            onClick={allWithDrawal}
+                            style={{ width: '150px', fontSize: '13px' }}>
+                                全部提现
+                            </Button>
+                        </div>
                         <Form.Item
                             name='type'
                             label='提现方式'

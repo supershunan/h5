@@ -13,7 +13,7 @@ export default function Setting() {
     const [visible, setVisible] = useState(false)
     const links = [
         {
-            text: '隐私策略',
+            text: '隐私政策',
             href: '/privacyPolicy',
         },
         {

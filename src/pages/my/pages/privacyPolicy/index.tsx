@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
                 dangerouslySetInnerHTML={{ __html: privacyPolicy?.val }}
                 className='toolbox-content'
             /> */}
-            <iframe src="https://lddian.com/xe/yhxy.html" style={{ width: '100%', height: '100%' }}></iframe>
+            <iframe src="https://lddian.com/xe/ys.html" style={{ width: '100%', height: '100%' }}></iframe>
         </div>
     )
 }

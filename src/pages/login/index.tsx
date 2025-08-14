@@ -90,6 +90,7 @@ export default function Login() {
         })
         if (res.code === RequstStatusEnum.success) {
             localStorage.setItem('Token', res.data.token);
+            localStorage.setItem('TokenTime', new Date().getTime().toString());
         }
         return res.code === RequstStatusEnum.success;
     }
@@ -106,6 +107,7 @@ export default function Login() {
         })
         if (res.code === RequstStatusEnum.success) {
             localStorage.setItem('Token', res.data.token);
+            localStorage.setItem('TokenTime', new Date().getTime().toString());
         }
         return res.code === RequstStatusEnum.success;
     }

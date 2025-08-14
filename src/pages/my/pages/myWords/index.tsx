@@ -30,7 +30,7 @@ export default function MyWords() {
         setHasMore(status)
     }
 
-    const wordsItemDetail = (data: { keywords: string, oriName: string }) => {
+    const wordsItemDetail = (data: { keywords: string, keywords: string }) => {
         Modal.show({
             content: (<div style={{ display: 'flex', alignItems: 'center'}}>
                 <span style={{marginRight: '10px'}}>关键词：{data.keywords}</span>
@@ -84,12 +84,11 @@ export default function MyWords() {
                                 </div>
                                 <div className="wordItemTitle">
                                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                                        <span className="oriName" style={{width: '110px'}}>别名：{item.oriName}</span>
+                                        <span className="keywords" style={{width: '110px'}}>别名：{item.keywords}</span>
                                         <Button onClick={() => handleCopy(item.keywords)} color='primary' size='mini'>复制</Button>
                                     </div>
                                     <span className="status">推广中</span>
                                     <span style={{ fontSize: '12px' }}>申请时间：{item.createTime}</span>
-                                    {/* <span className="keywords">关键词：{item.keywords}</span> */}
                                 </div>
                             </div>
                         </List.Item>
