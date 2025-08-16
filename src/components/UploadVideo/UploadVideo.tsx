@@ -154,7 +154,7 @@ export default function UploadVideo() {
                 return {
                     label: item.title,
                     value: item.id,
-                    labelList: item.labelList,
+                    // labelList: item.labelList,
                 };
             }
         );
@@ -171,7 +171,7 @@ export default function UploadVideo() {
                     url: res.data.coverImg,
                 },
             ];
-            res.data.labelList = [Number(res.data.labelList[0])];
+            // res.data.labelList = [Number(res.data.labelList[0])];
             res.code === RequstStatusEnum.success && setVideoDetail(res.data);
         }
     };
@@ -204,7 +204,7 @@ export default function UploadVideo() {
             pid: id ? id : values.collection[0], //合集的id
             useTime: values.useTime, //购买一次使用的时间，单位 小时
             money: Number(values.money), //价格
-            labelList: values.labelList, //分类id
+            // labelList: values.labelList, //分类id
         };
         const res = await request("/newApi/works/addVideo", {
             method: "POST",
@@ -254,7 +254,7 @@ export default function UploadVideo() {
             pid: values.collection[0],
             useTime: values.useTime,
             money: Number(values.money),
-            labelList: values.labelList,
+            // labelList: values.labelList,
         };
         const res = await request("/newApi/works/update", {
             method: "POST",
@@ -623,7 +623,7 @@ export default function UploadVideo() {
                             <div>
                                 价格
                                 <span style={{ color: "#1677ff", fontSize: "10px" }}>
-                                    100灵动币=1元
+                                    10灵动币=1元
                                 </span>
                             </div>
                         }
@@ -660,9 +660,9 @@ export default function UploadVideo() {
                         }}
                         onConfirm={(v) => {
                             setColllectionValue(v);
-                            const value = colllectionClassify.find(item => item[0]?.value === v[0])?.[0]?.labelList
-                            setVideoValue(value);
-                            form.setFieldValue('labelList', value)
+                            // const value = colllectionClassify.find(item => item[0]?.value === v[0])?.[0]?.labelList
+                            // setVideoValue(value);
+                            // form.setFieldValue('labelList', value)
                         }}
                         onSelect={(val, extend) => {
                         }}
@@ -678,7 +678,7 @@ export default function UploadVideo() {
                         }}
                     </Picker>
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                     name="labelList"
                     label="分类"
                     trigger="onConfirm"
@@ -710,7 +710,7 @@ export default function UploadVideo() {
                             );
                         }}
                     </Picker>
-                </Form.Item>
+                </Form.Item> */}
                 <Form.Item name="title" label="视频名" rules={[{ required: true }]}>
                     <Input placeholder="请输入" />
                 </Form.Item>

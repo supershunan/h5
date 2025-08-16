@@ -30,6 +30,11 @@ export default async function request(
     }
   }
   console.log(path)
+  if (isOverdue) {
+      window.localStorage.removeItem('Token');
+      window.localStorage.removeItem('TokenTime');
+  }
+
   if (isOverdue && !path.includes('loginForH5')) {
     history.push("/login");
       Toast.show({

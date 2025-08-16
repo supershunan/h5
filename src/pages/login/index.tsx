@@ -83,7 +83,7 @@ export default function Login() {
             account: values.account,
             password: md5(values.password)
         }
-        const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
+        const res = await request(`/newApi/auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
             method: 'POST',
             skipAuth: true,
             body: data
@@ -100,7 +100,7 @@ export default function Login() {
             account: values.account,
             code: values.smsCode
         }
-        const res = await request(`/newApi//auth/loginForH5/${LoginTypeEnum.phoneLogin}`, {
+        const res = await request(`/newApi/auth/loginForH5/${LoginTypeEnum.phoneLogin}`, {
             method: 'POST',
             skipAuth: true,
             body: data
