@@ -88,7 +88,11 @@ export default function MyWords() {
                                         <Button onClick={() => handleCopy(item.keywords)} color='primary' size='mini'>复制</Button>
                                     </div>
                                     <span className="status">推广中</span>
-                                    <span style={{ fontSize: '12px' }}>申请时间：{item.createTime}</span>
+                                    <span style={{ fontSize: '12px' }}>有效时间：{(() => {
+                                        const date = new Date(item.createTime);
+                                        date.setDate(date.getDate() + 30);
+                                        return date.toLocaleString();
+                                    })()}</span>
                                 </div>
                             </div>
                         </List.Item>

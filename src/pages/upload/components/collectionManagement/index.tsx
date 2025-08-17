@@ -57,7 +57,7 @@ export default function CollectionManagement() {
             getCollectionList();
         }
     }, [params]);
-    
+
     useEffect(() => {
         videoClass();
     }, []);
@@ -295,7 +295,7 @@ export default function CollectionManagement() {
         if (addStatus) {
             form.resetFields();
             setItemData(undefined); // 成功创建后重置 itemData
-        }else {
+        } else {
             return
         }
         reload();
@@ -515,10 +515,17 @@ export default function CollectionManagement() {
                             </div>}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item name="money" label="总合集价格">
+                            <Form.Item name="money" label={
+                                <div>
+                                    总合集价格
+                                    <span style={{ color: "#1677ff", fontSize: "10px" }}>
+                                        10灵动币=1元
+                                    </span>
+                                </div>
+                            } initialValue={0}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]}>
+                            <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]} initialValue={48}>
                                 <Input placeholder="请输入" type="number" />
                             </Form.Item>
                             <Form.Item

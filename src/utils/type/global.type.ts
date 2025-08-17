@@ -18,6 +18,8 @@ export enum CustomizeInfoEnum {
     h5UserProtocol = 'h5_user_protocol',
     /** 工具箱 */
     tools = 'tools',
+    /** App 下载 */
+    permission = 'permission',
 }
 
 export enum MoneyTypeEnum {

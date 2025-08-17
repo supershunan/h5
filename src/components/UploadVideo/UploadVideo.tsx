@@ -315,7 +315,7 @@ export default function UploadVideo() {
 
     const startUploadVideo = async () => {
         if (!videoFile) return null
-        
+
         return new Promise((resolve, reject) => {
             if (!aliOSSUploader) {
                 reject(new Error('上传器未初始化'));
@@ -642,7 +642,7 @@ export default function UploadVideo() {
                         <Input placeholder="请输入" type="number" />
                     </Form.Item>
                 </div>
-                <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]}>
+                <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]} initialValue={48}>
                     <Input placeholder="请输入" type="number" />
                 </Form.Item>
                 <Form.Item
