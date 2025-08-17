@@ -29,19 +29,19 @@ export default async function request(
       return Promise.reject();
     }
   }
-  console.log(path)
+
   if (isOverdue) {
-      window.localStorage.removeItem('Token');
-      window.localStorage.removeItem('TokenTime');
+    window.localStorage.removeItem("Token");
+    window.localStorage.removeItem("TokenTime");
   }
 
-  if (isOverdue && !path.includes('loginForH5')) {
+  if (isOverdue && !path.includes("loginForH5")) {
     history.push("/login");
-      Toast.show({
-        icon: "fail",
-        content: "登录信息过期",
-      });
-      return Promise.reject();
+    Toast.show({
+      icon: "fail",
+      content: "登录信息过期",
+    });
+    return Promise.reject();
   }
 
   // 重置 headers
@@ -58,18 +58,16 @@ export default async function request(
     body: options?.body ? JSON.stringify(options.body) : undefined,
   };
 
-  const fetchPromise = await fetch(BASE_URL + path, updateOptions);
-
-  // 超时时间
-  const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(
-      () => reject(new Error("Request timed out")),
-      options?.timeout || 5000
-    )
-  );
-
   try {
-    const response = await Promise.race([fetchPromise, timeoutPromise]);
+    const response = await Promise.race([
+      fetch(BASE_URL + path, updateOptions),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Request timed out")),
+          options?.timeout || 5000
+        )
+      ),
+    ]);
 
     const data = (await response.json()) as T;
 

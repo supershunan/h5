@@ -83,16 +83,21 @@ export default function Login() {
             account: values.account,
             password: md5(values.password)
         }
-        const res = await request(`/newApi/auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
-            method: 'POST',
-            skipAuth: true,
-            body: data
-        })
-        if (res.code === RequstStatusEnum.success) {
-            localStorage.setItem('Token', res.data.token);
-            localStorage.setItem('TokenTime', new Date().getTime().toString());
+        try {
+            const res = await request(`/newApi/auth/loginForH5/${LoginTypeEnum.pwLogin}`, {
+                method: 'POST',
+                skipAuth: true,
+                body: data
+            })
+            if (res.code === RequstStatusEnum.success) {
+                localStorage.setItem('Token', res.data.token);
+                localStorage.setItem('TokenTime', new Date().getTime().toString());
+            }
+            return res.code === RequstStatusEnum.success;
+        } catch (error) {
+            window.location.reload();
+            return false;
         }
-        return res.code === RequstStatusEnum.success;
     }
 
     const phoneLogin = async (values: any): Promise<boolean> => {
@@ -100,16 +105,21 @@ export default function Login() {
             account: values.account,
             code: values.smsCode
         }
-        const res = await request(`/newApi/auth/loginForH5/${LoginTypeEnum.phoneLogin}`, {
-            method: 'POST',
-            skipAuth: true,
-            body: data
-        })
-        if (res.code === RequstStatusEnum.success) {
-            localStorage.setItem('Token', res.data.token);
-            localStorage.setItem('TokenTime', new Date().getTime().toString());
+        try {
+            const res = await request(`/newApi/auth/loginForH5/${LoginTypeEnum.phoneLogin}`, {
+                method: 'POST',
+                skipAuth: true,
+                body: data
+            })
+            if (res.code === RequstStatusEnum.success) {
+                localStorage.setItem('Token', res.data.token);
+                localStorage.setItem('TokenTime', new Date().getTime().toString());
+            }
+            return res.code === RequstStatusEnum.success;
+        } catch (error) {
+            window.location.reload();
+            return false;
         }
-        return res.code === RequstStatusEnum.success;
     }
 
     const sendCode = async () => {
