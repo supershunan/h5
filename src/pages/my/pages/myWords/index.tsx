@@ -17,7 +17,7 @@ export default function MyWords() {
         const status = res.code === RequstStatusEnum.success && res.rows.length > 0;
 
         if (status) {
-            const newData = res.rows
+            const newData = res.rows.filter((item: any) => item.status === 1)
             setData([
                 ...data,
                 ...newData

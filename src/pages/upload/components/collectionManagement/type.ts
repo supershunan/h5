@@ -24,6 +24,8 @@ export interface AddFolderParams {
     money: number;
     /** 分类 */
     labelList: Array<any>;
+    /** 有效期时长(小时) */
+    useTime: number;
 }
 
 export interface CollectionItem {

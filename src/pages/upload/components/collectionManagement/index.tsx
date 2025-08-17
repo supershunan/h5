@@ -115,6 +115,7 @@ export default function CollectionManagement() {
                 : PromotionEnum.end,
             info: params?.info,
             money: params.money,
+            useTime: params.useTime,
             labelList: params.labelList,
         };
         const res = await request("/newApi/works/addFolder", {
@@ -146,6 +147,7 @@ export default function CollectionManagement() {
                 : PromotionEnum.end,
             info: item.info,
             money: item.money,
+            useTime: item.useTime,
             labelList: item.labelList,
         };
         if (item?.enablePromotion && !item.promotionUrl) {
@@ -513,10 +515,11 @@ export default function CollectionManagement() {
                             </div>}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item name="money" label="总合集价格" rules={[
-                                { required: true },
-                            ]}>
+                            <Form.Item name="money" label="总合集价格">
                                 <Input placeholder="请输入" />
+                            </Form.Item>
+                            <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]}>
+                                <Input placeholder="请输入" type="number" />
                             </Form.Item>
                             <Form.Item
                                 name="labelList"

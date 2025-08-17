@@ -642,6 +642,9 @@ export default function UploadVideo() {
                         <Input placeholder="请输入" type="number" />
                     </Form.Item>
                 </div>
+                <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]}>
+                    <Input placeholder="请输入" type="number" />
+                </Form.Item>
                 <Form.Item
                     name="collection"
                     label="合集选择"
