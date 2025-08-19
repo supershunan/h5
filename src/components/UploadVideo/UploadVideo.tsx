@@ -340,7 +340,7 @@ export default function UploadVideo() {
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
-        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
+        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422,  compressWidth: 64, compressHeight: 64 })
         setImgFile(compressFile)
         return {
             url: URL.createObjectURL(compressFile),
@@ -362,7 +362,7 @@ export default function UploadVideo() {
         setVideoFile(compressedFile);
         const paramData = JSON.stringify({
             Vod: {
-                TemplateGroupId: '18ea3c3ee4c67b23d9a79e57c2923a2f'
+                TemplateGroupId: '61d7bfdae9bb06dd9f29852598242f22'
             }
         })
         aliOSSUploader?.uploader.addFile(compressedFile, null, null, null, paramData)
@@ -537,7 +537,7 @@ export default function UploadVideo() {
         canvas.toBlob(async (blob) => {
             if (blob) {
                 const file = new File([blob], 'cropped.png', { type: 'image/png' })
-                const compressedFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
+                const compressedFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422,  compressWidth: 64, compressHeight: 64 })
                 setImgFile(compressedFile)
 
                 // 创建预览URL并更新UI

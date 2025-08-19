@@ -346,7 +346,7 @@ export default function CollectionManagement() {
     }
 
     const upload = async (file: File): Promise<ImageUploadItem> => {
-        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
+        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422,  compressWidth: 64, compressHeight: 64 })
         setImgFile(compressFile)
         return {
             url: URL.createObjectURL(file),
@@ -471,7 +471,8 @@ export default function CollectionManagement() {
                     bodyStyle={{
                         borderTopLeftRadius: "8px",
                         borderTopRightRadius: "8px",
-                        minHeight: "40vh",
+                        maxHeight: "90vh",
+                        overflow: 'scroll',
                         maxWidth: '450px'
                     }}
                 >
@@ -525,7 +526,7 @@ export default function CollectionManagement() {
                             } initialValue={0}>
                                 <Input placeholder="请输入" />
                             </Form.Item>
-                            <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]} initialValue={48}>
+                            <Form.Item name="useTime" label="有效期时长(小时)" rules={[{ required: true }]} initialValue={168 }>
                                 <Input placeholder="请输入" type="number" />
                             </Form.Item>
                             <Form.Item

@@ -3,7 +3,7 @@ import request from '@/utils/request/request';
 // 图片压缩
 export const imgCompress = async (
   file: File,
-  options: { maxWidth?: number; maxHeight?: number }
+  options: { maxWidth?: number; maxHeight?: number, compressWidth?: number, compressHeight?: number }
 ): Promise<File> => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -24,8 +24,8 @@ export const imgCompress = async (
           width = Math.round((img.width * maxHeight) / img.height);
         }
       }
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = options.compressWidth || width;
+      canvas.height = options.compressHeight || height;
       ctx?.drawImage(img, 0, 0, width, height);
       const base64 = canvas.toDataURL("image/jpeg", 0.7);
       const compressFile = dataURLToBlob(base64);
