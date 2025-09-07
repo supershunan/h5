@@ -11,22 +11,35 @@ export const imgCompress = async (
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const maxWidth = options.maxWidth || img.width;
-      const maxHeight = options.maxHeight || img.width;
-      let width = img.width;
-      let height = img.height;
-      if (img.width > maxWidth || img.height > maxHeight) {
-        if (img.width > img.height) {
-          width = maxWidth;
-          height = Math.round((img.height * maxWidth) / img.width);
-        } else {
-          height = maxHeight;
-          width = Math.round((img.width * maxHeight) / img.height);
+      
+      // 如果指定了压缩尺寸，直接使用这些尺寸
+      if (options.compressWidth && options.compressHeight) {
+        canvas.width = options.compressWidth;
+        canvas.height = options.compressHeight;
+        // 直接绘制到指定尺寸，图片会被拉伸到完整尺寸
+        ctx?.drawImage(img, 0, 0, options.compressWidth, options.compressHeight);
+      } else {
+        // 否则使用最大尺寸限制，保持比例
+        const maxWidth = options.maxWidth || img.width;
+        const maxHeight = options.maxHeight || img.height;
+        let width = img.width;
+        let height = img.height;
+        
+        if (img.width > maxWidth || img.height > maxHeight) {
+          if (img.width > img.height) {
+            width = maxWidth;
+            height = Math.round((img.height * maxWidth) / img.width);
+          } else {
+            height = maxHeight;
+            width = Math.round((img.width * maxHeight) / img.height);
+          }
         }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
       }
-      canvas.width = options.compressWidth || width;
-      canvas.height = options.compressHeight || height;
-      ctx?.drawImage(img, 0, 0, width, height);
+      
       const base64 = canvas.toDataURL("image/jpeg", 0.7);
       const compressFile = dataURLToBlob(base64);
       compressFile.lastModified = file.lastModified;

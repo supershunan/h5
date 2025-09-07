@@ -35,7 +35,7 @@ export default async function request(
     window.localStorage.removeItem("TokenTime");
   }
 
-  if (isOverdue && !path.includes("loginForH5")) {
+  if (isOverdue && (!path.includes("loginForH5") && !path.includes("captchaImage"))) {
     history.push("/login");
     Toast.show({
       icon: "fail",

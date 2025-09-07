@@ -346,7 +346,7 @@ export default function CollectionManagement() {
     }
 
     const upload = async (file: File): Promise<ImageUploadItem> => {
-        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422,  compressWidth: 64, compressHeight: 64 })
+        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422})
         setImgFile(compressFile)
         return {
             url: URL.createObjectURL(file),

@@ -340,7 +340,7 @@ export default function UploadVideo() {
     }
 
     const uploadImg = async (file: File): Promise<ImageUploadItem> => {
-        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422,  compressWidth: 64, compressHeight: 64 })
+        const compressFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422})
         setImgFile(compressFile)
         return {
             url: URL.createObjectURL(compressFile),
@@ -537,7 +537,7 @@ export default function UploadVideo() {
         canvas.toBlob(async (blob) => {
             if (blob) {
                 const file = new File([blob], 'cropped.png', { type: 'image/png' })
-                const compressedFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422,  compressWidth: 64, compressHeight: 64 })
+                const compressedFile = await imgCompress(file, { maxWidth: 750, maxHeight: 422 })
                 setImgFile(compressedFile)
 
                 // 创建预览URL并更新UI
