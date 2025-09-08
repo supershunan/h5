@@ -50,8 +50,11 @@ export default function Login() {
             account: values.account,
             password: md5(values.password), //密码md5加密
             smsCode: values.smsCode,//短信验证码
-            // pid: null //推荐人id，如果推荐人不为空，则要传到后台，如果推荐人不是团长会返回请求非法
+            // pid: id ?? null //推荐人id，如果推荐人不为空，则要传到后台，如果推荐人不是团长会返回请求非法
         };
+        if (id) {
+            data.pid = id;
+        }
         const res = await request('/newApi/auth/regForH5', {
             method: 'POST',
             skipAuth: true,

@@ -36,7 +36,7 @@ export default async function request(
   }
 
   // 这三类接口不进行拦截
-  if (isOverdue && (!path.includes("loginForH5") && !path.includes("captchaImage") && !path.includes("sendSms"))) {
+  if (isOverdue && (!path.includes("loginForH5") && !path.includes("captchaImage") && !path.includes("sendSms") && !path.includes("regForH5"))) {
     history.push("/login");
     Toast.show({
       icon: "fail",
